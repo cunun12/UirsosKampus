@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "264508095430",
+    "firebase_url": "https://uirsoskampus.firebaseio.com",
+    "project_id": "uirsoskampus",
+    "storage_bucket": "uirsoskampus.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:264508095430:android:07ae73cbcfe6679e",
+        "android_client_info": {
+          "package_name": "com.uirsos.www.uirsoskampus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "264508095430-7f0ljtigmelr16ne2lg4fkcv7m69at9k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uirsos.www.uirsoskampus",
+            "certificate_hash": "1c1d55c9ba74bdf4e34c299f824b62072bc7702b"
+          }
+        },
+        {
+          "client_id": "264508095430-3u052s7e0v1qa6tb9dpmc4cvq1hq7ms7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACqYSTbeuRNJryuKglgRnzqQU7e8ycLdI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "264508095430-3u052s7e0v1qa6tb9dpmc4cvq1hq7ms7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

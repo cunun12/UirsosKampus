@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.uirsos.www.uirsoskampus.Profile.SetupActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/green"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_horizontal"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/masukan_data_profile"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="#fcfcfb"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- profil image-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/key_npm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/imageProfil"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:src="@drawable/no_picture"
+                    app:civ_border_color="#FFFFFFFF"
+                    app:civ_border_width="2dp" />
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignBottom="@id/imageProfil"
+                    android:layout_alignRight="@id/imageProfil"
+                    android:src="@drawable/ic_camera" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <!--update data nama pengguna dan jurusan user-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:orientation="vertical">
+
+
+            <EditText
+                android:id="@+id/namaPengguna"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nama"
+                android:inputType="textPersonName"
+                android:textColorHint="@color/cardview_light_background" />
+
+            <TextView
+                android:layout_marginTop="10dp"
+                android:id="@+id/fakultas_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:textAllCaps="true"
+                android:textSize="14sp"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/statushint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:textAllCaps="true"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <Spinner
+                android:id="@+id/kategorifakultas"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+
+            <RadioGroup
+                android:id="@+id/radioJk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <RadioButton
+                    android:id="@+id/laki_laki"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:onClick="gender"
+                    android:text="@string/laki_laki"
+                    android:textColor="#ff0000" />
+
+                <RadioButton
+                    android:id="@+id/perempuan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:onClick="gender"
+                    android:text="@string/perempuan"
+                    android:textColor="#ff00bf" />
+
+
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/gender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+            <com.rey.material.widget.Button
+                android:id="@+id/btn_simpan"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:shadowColor="@color/cardview_dark_background"
+                android:text="@string/simpan"
+                android:textColor="@color/cardview_dark_background"
+                android:textColorHighlight="@color/colorPrimaryDark" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

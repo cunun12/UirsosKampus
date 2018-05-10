@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.uirsos.www.uirsoskampus.StatusInfo.MainActivity">
+
+    <!--Header-->
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.Toolbar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/blackgreen">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="UIRSOS"
+                    android:textAllCaps="true"
+                    android:textColor="@color/bottomWhite" />
+
+            </android.support.v7.widget.Toolbar>
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabAtas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border_top"
+                app:tabIndicatorColor="#fff"
+                app:tabSelectedTextColor="#fff" />
+
+        </android.support.design.widget.AppBarLayout>
+
+    </RelativeLayout>
+
+    <!--Body / Container-->
+    <RelativeLayout
+        android:id="@+id/body"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/header"
+        android:layout_marginBottom="60dp">
+
+        <include layout="@layout/layout_center_viewpager" />
+
+    </RelativeLayout>
+
+    <!--Bottom / Footer-->
+
+    <include layout="@layout/layout_bottom_navbar" />
+
+</RelativeLayout>

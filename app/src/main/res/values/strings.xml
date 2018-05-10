@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">UirsosKampus</string>
+    <string name="belum_punya_akun">Belum punya akun?</string>
+    <string name="sudah_punya_akun">Sudah punya akun?</string>
+    <string name="check">Check</string>
+    <string name="regitrasi">DAFTAR</string>
+    <string name="masuk">MASUK</string>
+    <string name="npm_1235xxxxx">NPM (1235xxxxx)</string>
+    <string name="email">Email (name@gmail.com)</string>
+    <string name="password">Password</string>
+    <string name="confrim_password">Confrim Password</string>
+    <string name="no_hp_0812xxxxxxxx">No.Hp (812xxxxxxxx)</string>
+    <string name="kode_verifikasi">Kode Verifikasi</string>
+    <string name="_62">+62</string>
+    <string name="noHP">No Handphone</string>
+    <string name="daftarEmail">Email</string>
+    <string name="account_setting">Account Setting</string>
+    <string name="logout">Logout</string>
+    <string name="masukan_data_profile">Masukan Data Profile</string>
+    <string name="simpan">Simpan</string>
+    <string name="laki_laki">Laki-laki</string>
+    <string name="perempuan">Perempuan</string>
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+
+    <string name="status">STATUS</string>
+    <string name="pikirkan">Apa yang anda pikirkan</string>
+    <string name="info">INFO KAMPUS</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="nama_pengguna">Nama Pengguna</string>
+    <string name="komentar">Komentar</string>
+    <string name="fakultas">Fakultas</string>
+    <string name="no_Connection">Tidak ada jaringan</string>
+    <string name="koneksi_gagal">No Connection To Server</string>
+
+</resources>

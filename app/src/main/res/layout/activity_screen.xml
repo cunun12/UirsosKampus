@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0fd700"
+    tools:context="com.uirsos.www.uirsoskampus.ScreenActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/logoUirsos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="UIRSOS"
+            android:textColor="#fff"
+            android:textSize="46sp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large" />
+
+        <TextView
+            android:id="@+id/deskripsiUirsos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="#ffee00"
+            android:text="Media Sosial Universitas Islam Riau" />
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

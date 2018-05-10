@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!--Bagian User-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/backgroun_komentarbottom">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/defaulticon" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/nama_User"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nama Pengguna"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+            <TextView
+                android:id="@+id/komentar_User"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Komentar" />
+
+            <TextView
+                android:id="@+id/time_Komentar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="waktu"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Info" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

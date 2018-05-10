@@ -1,0 +1,318 @@
+package com.uirsos.www.uirsoskampus.Adapter;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.uirsos.www.uirsoskampus.POJO.Status_PostList;
+import com.uirsos.www.uirsoskampus.POJO.User;
+import com.uirsos.www.uirsoskampus.Profile.FriendActivity;
+import com.uirsos.www.uirsoskampus.Profile.ProfileActivity;
+import com.uirsos.www.uirsoskampus.R;
+import com.uirsos.www.uirsoskampus.StatusInfo.KomentarActivity;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+
+import static android.content.ContentValues.TAG;
+
+/**
+ * Created by cunun12 on 05/05/2018.
+ */
+
+public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHolder> {
+
+    private static final String LOG_TAG = "Adapterstatus";
+    public List<Status_PostList> postLists;
+    public List<User> userList;
+    Context context;
+
+    private FirebaseFirestore firebaseFirestore;
+    private FirebaseAuth firebaseAuth;
+
+    public AdapterStatus(List<Status_PostList> postList, List<User> userList) {
+
+        this.postLists = postList;
+        this.userList = userList;
+    }
+
+    @NonNull
+    @Override
+    public AdapterStatus.StatusHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_status, parent, false);
+        context = parent.getContext();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        return new StatusHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull final AdapterStatus.StatusHolder holder, final int position) {
+
+        holder.setIsRecyclable(false);
+
+        final String postId = postLists.get(position).PostId;
+        final String currentUserId = firebaseAuth.getCurrentUser().getUid();
+
+        String desc_data = postLists.get(position).getDesc();
+        holder.setDescText(desc_data);
+
+        String imageUrl = postLists.get(position).getImage_post();
+        holder.setPostImage(imageUrl);
+
+        final String user_id = postLists.get(position).getUser_id();
+
+        String userName = userList.get(position).getNama_user();
+        String userImage = userList.get(position).getImage();
+        holder.setUserData(userName);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
+        String postTimestamp = postLists.get(position).getTimestamp();
+        Date timestamp;
+        long detik = 0;
+        long menit = 0;
+        long jam = 0;
+        long hari = 0;
+
+        try {
+            timestamp = sdf.parse(postTimestamp);
+            Date now = new Date();
+
+            detik = TimeUnit.MILLISECONDS.toSeconds(now.getTime() - timestamp.getTime());
+            menit = TimeUnit.MILLISECONDS.toMinutes(now.getTime() - timestamp.getTime());
+            jam = TimeUnit.MILLISECONDS.toHours(now.getTime() - timestamp.getTime());
+            hari = TimeUnit.MILLISECONDS.toDays(now.getTime() - timestamp.getTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (detik<1){
+            Log.d(TAG, "onBindViewHolder: detik" + detik);
+            holder.setTime("Baru");
+        } else if (detik < 60) {
+            Log.d(TAG, "onBindViewHolder: detik" + detik);
+            String postDetik = String.valueOf(detik);
+            holder.setTime(postDetik + " Detik yang Lalu");
+        } else if (menit < 60) {
+            Log.d(TAG, "onBindViewHolder: menit" + menit);
+            String postMenit = String.valueOf(menit);
+            holder.setTime(postMenit + " Menit yang lalu");
+        } else if (jam < 24) {
+            Log.d(TAG, "onBindViewHolder: jam" + jam);
+            String postJam = String.valueOf(jam);
+            holder.setTime(postJam + " Jam yang Lalu");
+        } else if (hari < jam) {
+            Log.d(TAG, "onBindViewHolder: hari" + hari);
+            String postHari = String.valueOf(hari);
+            holder.setTime(postHari + " Hari yang lalu");
+        } else {
+            holder.setTime(postTimestamp);
+        }
+
+
+    /*Start Fitur Like*/
+
+        //getCount
+        firebaseFirestore.collection("post_user/" + postId + "/Likes").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+
+                if (documentSnapshots != null) {
+
+                    int count = documentSnapshots.size();
+                    holder.updateLikeCount(count);
+
+                } else {
+
+                    holder.updateLikeCount(0);
+
+                }
+
+            }
+        });
+
+        //imageLike
+        firebaseFirestore.collection("post_user/" + postId + "/Likes").document(currentUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
+
+                if (firebaseAuth.getCurrentUser() != null) {
+                    if (e != null) {
+                        Log.w(LOG_TAG, ":onEvent", e);
+                        return;
+                    }
+                    if (documentSnapshot.exists()) {
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            holder.likeImage.setImageDrawable(context.getDrawable(R.mipmap.action_like_red));
+                        }
+
+                    } else {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            holder.likeImage.setImageDrawable(context.getDrawable(R.mipmap.action_like_grey));
+                        }
+                    }
+                }
+            }
+        });
+
+        //touch image
+        holder.btnLikePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                firebaseFirestore.collection("post_user/" + postId + "/Likes").document(currentUserId)
+                        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (!task.getResult().exists()) {
+
+                            Map<String, Object> likeMap = new HashMap<>();
+                            likeMap.put("timestamp", FieldValue.serverTimestamp());
+
+                            firebaseFirestore.collection("post_user/" + postId + "/Likes").document(currentUserId).set(likeMap);
+
+                        } else {
+
+                            firebaseFirestore.collection("post_user/" + postId + "/Likes").document(currentUserId).delete();
+
+                        }
+                    }
+                });
+            }
+        });
+
+    /*End Like*/
+
+        holder.lineUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Log.d(TAG, "onClickUser: " + user_id);
+//                Toast.makeText(context, user_id, Toast.LENGTH_SHORT).show();
+                String currentUser = firebaseAuth.getCurrentUser().getUid();
+//                Log.d(TAG, "onClickActif: " + currentUser);
+
+                if (!currentUser.equals(user_id)) {
+
+                    Log.d(TAG, "onClickFriend: ");
+                    Intent komentar = new Intent(v.getContext(), FriendActivity.class);
+                    komentar.putExtra("idUser", user_id);
+                    v.getContext().startActivity(komentar);
+                } else {
+                    Log.d(TAG, "onClickProfile: ");
+                    Intent komentar = new Intent(v.getContext(), ProfileActivity.class);
+                    komentar.putExtra("idUser", user_id);
+                    v.getContext().startActivity(komentar);
+                }
+            }
+        });
+
+
+    /*Tombol Komentar*/
+
+    holder.btnKomentar.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent komentar = new Intent(view.getContext(), KomentarActivity.class);
+            komentar.putExtra("idPost", postLists.get(position).PostId);
+            view.getContext().startActivity(komentar);
+        }
+    });
+
+    /*End Komentar*/
+    }
+
+
+    @Override
+    public int getItemCount() {
+        return postLists.size();
+    }
+
+    public class StatusHolder extends RecyclerView.ViewHolder {
+
+        private View mView;
+
+        private TextView descView, postDate, postUserName, postLikeCount;
+        private ImageView postImage, likeImage;
+        private CircleImageView postUserImage;
+
+        private LinearLayout btnLikePost, btnKomentar;
+        private LinearLayout lineUser;
+
+        public StatusHolder(View itemView) {
+            super(itemView);
+
+            mView = itemView;
+            btnLikePost = mView.findViewById(R.id.like_Pengguna);
+            btnKomentar = mView.findViewById(R.id.post_komentar);
+            likeImage = mView.findViewById(R.id.post_Like);
+
+            lineUser = mView.findViewById(R.id.line_user);
+        }
+
+        public void setDescText(String text) {
+            descView = mView.findViewById(R.id.desc_post);
+            descView.setText(text);
+        }
+
+        public void setPostImage(String downloadUri) {
+
+            postImage = mView.findViewById(R.id.post_image);
+            Glide.with(context)
+                    .load(downloadUri)
+                    .into(postImage);
+
+        }
+
+        public void setTime(String date) {
+            postDate = mView.findViewById(R.id.date_post);
+            postDate.setText(date);
+        }
+
+        public void updateLikeCount(int count) {
+            postLikeCount = mView.findViewById(R.id.post_likeCount);
+            postLikeCount.setText(count + " Likes");
+        }
+
+        public void setUserData(String name) {
+            postUserName = mView.findViewById(R.id.nama_Pengguna);
+            postUserImage = mView.findViewById(R.id.img_Profile);
+
+            postUserName.setText(name);
+//
+//            RequestOptions requestOptions = new RequestOptions();
+//            requestOptions.placeholder(R.drawable.defaulticon);
+//            Glide.with(context.getApplicationContext()).applyDefaultRequestOptions(requestOptions).load(image).into(postUserImage);
+        }
+    }
+}
