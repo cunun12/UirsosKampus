@@ -51,7 +51,12 @@ public class BottomNavigationHelper {
                         context.startActivity(intentProfile);
 
                         break;
+                    case R.id.verifikasiUser:
+                        Intent intentVerifikasi = new Intent(context, ProfileActivity.class); //Activity num 2
+                        intentVerifikasi.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        context.startActivity(intentVerifikasi);
 
+                        break;
                 }
 
                 return false;

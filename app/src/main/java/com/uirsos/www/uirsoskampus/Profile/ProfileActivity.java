@@ -1,12 +1,14 @@
 package com.uirsos.www.uirsoskampus.Profile;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -15,8 +17,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,15 +29,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.uirsos.www.uirsoskampus.Adapter.AdapterHistory;
-import com.uirsos.www.uirsoskampus.Adapter.AdapterStatus;
 import com.uirsos.www.uirsoskampus.POJO.Status_PostList;
 import com.uirsos.www.uirsoskampus.R;
 import com.uirsos.www.uirsoskampus.SignUp.LoginActivity;
-import com.uirsos.www.uirsoskampus.StatusInfo.MainActivity;
+import com.uirsos.www.uirsoskampus.SignUp.VerifikasiAccount;
 import com.uirsos.www.uirsoskampus.Utils.BottomNavigationHelper;
 import com.uirsos.www.uirsoskampus.Utils.GridImageDecoration;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +48,7 @@ public class ProfileActivity extends AppCompatActivity {
     private static final int ACTIVITY_NUM = 1;
 
     //widget
+    BottomNavigationViewEx defaultBottomNav, adminBottomNav;
     private CircleImageView imgProfile;
     private TextView textNpm, textNama, textGender, textStatus, textFakultas;
     private ImageView statusLine;
@@ -75,6 +79,10 @@ public class ProfileActivity extends AppCompatActivity {
         textFakultas = findViewById(R.id.txtFakultas);
         listHistori = findViewById(R.id.historyUser);
         statusLine = findViewById(R.id.image_button);
+        defaultBottomNav = (BottomNavigationViewEx) findViewById(R.id.defaultBottom);
+        adminBottomNav = (BottomNavigationViewEx) findViewById(R.id.adminNavbar);
+        adminBottomNav.setVisibility(View.GONE);
+
 
         //firebase
         mAuth = FirebaseAuth.getInstance();
@@ -130,7 +138,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void loadProfile() {
 
-        firebaseFirestore.collection("Users").document(user_id).get()
+        firebaseFirestore.collection("users").document(user_id).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -147,12 +155,12 @@ public class ProfileActivity extends AppCompatActivity {
                             textGender.setText(gender);
                             textFakultas.setText(fakultas);
 
-//                            RequestOptions placeholderrequest = new RequestOptions();
-//                            placeholderrequest.placeholder(R.drawable.defaulticon);
-//                            Glide.with(getApplicationContext())
-//                                    .setDefaultRequestOptions(placeholderrequest)
-//                                    .load(image)
-//                                    .into(imgProfile);
+                            RequestOptions placeholderrequest = new RequestOptions();
+                            placeholderrequest.placeholder(R.drawable.defaulticon);
+                            Glide.with(getApplicationContext())
+                                    .setDefaultRequestOptions(placeholderrequest)
+                                    .load(image)
+                                    .into(imgProfile);
                         }
                     }
                 });
@@ -162,19 +170,39 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
 
-        BottomNavigationViewEx bottomNavigationView = (BottomNavigationViewEx) findViewById(R.id.bottomNavBar);
-        BottomNavigationHelper.setupBottomNavigationView(bottomNavigationView);
-        BottomNavigationHelper.enableNavigation(ProfileActivity.this, bottomNavigationView);
-        Menu menu = bottomNavigationView.getMenu();
-        MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
-        menuItem.setChecked(true);
+        firebaseFirestore.collection("users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                String level = task.getResult().getString("level");
+                if (level.equals("admin")) {
+                    defaultBottomNav.setVisibility(View.GONE);
+                    adminBottomNav.setVisibility(View.VISIBLE);
+                    BottomNavigationHelper.setupBottomNavigationView(adminBottomNav);
+                    BottomNavigationHelper.enableNavigation(ProfileActivity.this, adminBottomNav);
+                    Menu menu = adminBottomNav.getMenu();
+                    MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
+                    menuItem.setChecked(true);
+
+                } else {
+                    adminBottomNav.setVisibility(View.GONE);
+                    defaultBottomNav.setVisibility(View.VISIBLE);
+                    //jika level bukan admin maka menu nya cuman ada menu home dan profile
+                    BottomNavigationHelper.setupBottomNavigationView(defaultBottomNav);
+                    BottomNavigationHelper.enableNavigation(ProfileActivity.this, defaultBottomNav);
+                    Menu menu = defaultBottomNav.getMenu();
+                    MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
+                    menuItem.setChecked(true);
+                }
+            }
+        });
+
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
 
-        firebaseFirestore.collection("Users").document(user_id).get()
+        firebaseFirestore.collection("users").document(user_id).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -202,12 +230,18 @@ public class ProfileActivity extends AppCompatActivity {
 
             case R.id.verifikasi:
 
-                Toast.makeText(this, "Verifikasi Data", Toast.LENGTH_SHORT).show();
+                Intent intentVerifikasi = new Intent(ProfileActivity.this, VerifikasiAccount.class);
+                startActivity(intentVerifikasi);
 
                 return true;
             case R.id.accountSetting:
 
-                Toast.makeText(this, "Setting Account", Toast.LENGTH_SHORT).show();
+                Intent setupActivity = new Intent(ProfileActivity.this, SetupActivity.class);
+                setupActivity.putExtra("update", 1);
+                setupActivity.putExtra("nama", textNama.getText());
+                setupActivity.putExtra("gender", textGender.getText());
+                setupActivity.putExtra("fakultas", textFakultas.getText());
+                startActivity(setupActivity);
 
                 return true;
 
@@ -223,6 +257,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
     }
+
 
     private void logout() {
 

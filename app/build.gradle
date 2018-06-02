@@ -9,7 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-//        multiDexEnabled true
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -52,6 +52,7 @@ dependencies {
     implementation 'id.zelory:compressor:2.1.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
 }
+
 
 
 

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -15,21 +16,36 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.uirsos.www.uirsoskampus.HandleRequest.APIServer;
+import com.uirsos.www.uirsoskampus.HandleRequest.RequestHandler;
 import com.uirsos.www.uirsoskampus.Profile.ProfileActivity;
 import com.uirsos.www.uirsoskampus.Profile.SetupActivity;
 import com.uirsos.www.uirsoskampus.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "Register";
     //widget
     private Button btnSend;
     private EditText inputNpm, inputEmail, inputPassword, inputRepassword;
@@ -118,22 +134,67 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         final String getNpm = inputNpm.getText().toString();
 
-        firebaseFirestore.collection("Users").whereEqualTo("npm", getNpm)
-                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.getResult().isEmpty()) {
-                    lineNpm.setVisibility(View.GONE);
-                    btnSend.setEnabled(false);
-                    lanjutRegist();
-                    Toast.makeText(RegisterActivity.this, "NPM Dapat digunakan", Toast.LENGTH_SHORT).show();
+//        StringRequest requestCheck = new StringRequest(Request.Method.POST, APIServer.check,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        Log.d(TAG, "onResponse: " + response.toString());
+//                        try {
+//                            JSONObject res = new JSONObject(response);
+//
+//                            String check = res.getString("check");
+//
+//                            if (check.equals("1")) {
+//                                Log.d(TAG, "onResponse: 1");
+//                                Toast.makeText(RegisterActivity.this, "NPM sudah terdaftar", Toast.LENGTH_SHORT).show();
+//                            } else {
+//                                Log.d(TAG, "onResponse: 0");
+//                                Toast.makeText(RegisterActivity.this, "NPM dapat digunakan", Toast.LENGTH_SHORT).show();
+//                                //                            lineNpm.setVisibility(View.GONE);
+////                            btnSend.setEnabled(false);
+////                            lanjutRegist();
+//                            }
+//
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Log.d(TAG, "onErrorResponse: " + error);
+//                        Toast.makeText(RegisterActivity.this, "Ini error nya " + error, Toast.LENGTH_SHORT).show();
+//                    }
+//                }) {
+//
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//
+//                Map<String, String> check = new HashMap<>();
+//                check.put("npm", getNpm);
+//
+//                return check;
+//            }
+//        };
+//
+//        RequestHandler.getInstance(RegisterActivity.this).addToRequestQueue(requestCheck);
+//
 
-                } else {
-                    Toast.makeText(RegisterActivity.this, "NPM tidak dapat digunakan", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
+        firebaseFirestore.collection("users").whereEqualTo("npm", getNpm).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.getResult().isEmpty()) {
+                            Toast.makeText(RegisterActivity.this, "NPM dapat digunakan", Toast.LENGTH_SHORT).show();
+                            lineNpm.setVisibility(View.GONE);
+                            btnSend.setEnabled(false);
+                            lanjutRegist();
+                        } else {
+                            Toast.makeText(RegisterActivity.this, "NPM sudah terdaftar", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
 
     }
 
@@ -150,7 +211,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onClick(View view) {
 
-
                 final String getNpm = inputNpm.getText().toString();
                 final String getEmail = inputEmail.getText().toString();
                 final String getPassword = inputPassword.getText().toString();
@@ -162,7 +222,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     if (Patterns.EMAIL_ADDRESS.matcher(getEmail).matches()) {
                         if (getPassword.equals(getRepassword)) {
 
-                            firebaseFirestore.collection("Users").whereEqualTo("email", getEmail).get()
+                            firebaseFirestore.collection("users").whereEqualTo("email", getEmail).get()
                                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                         @Override
                                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -206,11 +266,16 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                Intent setupIntent = new Intent(RegisterActivity.this, SetupActivity.class);
-                setupIntent.putExtra("npm", npm);
-                setupIntent.putExtra("email", email);
-                startActivity(setupIntent);
-                finish();
+                if (task.isSuccessful()) {
+                    Toast.makeText(RegisterActivity.this, "Berhasil Registrasi", Toast.LENGTH_SHORT).show();
+                    Intent setupIntent = new Intent(RegisterActivity.this, SetupActivity.class);
+                    setupIntent.putExtra("npm", npm);
+                    setupIntent.putExtra("email", email);
+                    startActivity(setupIntent);
+                    finish();
+                } else {
+                    Toast.makeText(RegisterActivity.this, "Gagal registrasi", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

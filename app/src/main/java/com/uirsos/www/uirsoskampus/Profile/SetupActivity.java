@@ -2,7 +2,6 @@ package com.uirsos.www.uirsoskampus.Profile;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -19,12 +18,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -67,6 +70,7 @@ public class SetupActivity extends AppCompatActivity {
     };
     //widget
     private Button btnSimpan;
+    private RadioGroup radioGroup;
     private EditText inputNama;
     private CircleImageView setupImage;
     private TextView setKelamin, kategoriFakultas;
@@ -111,20 +115,129 @@ public class SetupActivity extends AppCompatActivity {
         setupImage = findViewById(R.id.imageProfil);
         setKelamin = findViewById(R.id.gender);
         setKelamin.setText(R.string.laki_laki);
+        radioGroup = findViewById(R.id.radioJk);
         spinner = findViewById(R.id.kategorifakultas);
         kategoriFakultas = findViewById(R.id.fakultas_text);
         setSpinner();
         setImage();
 
-        /*Simpan Data User ke Database*/
+        final Intent updateData = getIntent();
+        final int update = updateData.getIntExtra("update", 0);
+        String updateNama = updateData.getStringExtra("nama");
+        String updateGender = updateData.getStringExtra("gender");
+        String updateFakultas = updateData.getStringExtra("fakultas");
+
+        if (update == 1) {
+            btnSimpan.setText("Update Data");
+            inputNama.setText(updateNama);
+            setKelamin.setText(updateGender);
+            kategoriFakultas.setText(updateFakultas);
+            kategoriFakultas.setVisibility(View.VISIBLE);
+            spinner.setVisibility(View.GONE);
+
+            RadioButton laki = findViewById(R.id.laki_laki);
+            RadioButton perempuan = findViewById(R.id.perempuan);
+
+            if (updateGender.equals("Laki-laki")) {
+                laki.setChecked(true);
+            } else {
+                perempuan.setChecked(true);
+            }
+
+            firestore.collection("users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @SuppressLint("CheckResult")
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        if (task.getResult().exists()) {
+                            String image = task.getResult().getString("image");
+
+                            if (image != null) {
+                                mainImageURI = Uri.parse(image);
+                                RequestOptions placeholderrequest = new RequestOptions();
+                                placeholderrequest.placeholder(R.drawable.defaulticon);
+                                Glide.with(getApplicationContext())
+                                        .setDefaultRequestOptions(placeholderrequest)
+                                        .load(image)
+                                        .into(setupImage);
+                            } else {
+                                mainImageURI = null;
+                                setupImage.setImageURI(mainImageURI);
+                            }
+
+                        }
+                    }
+                }
+            });
+
+
+        }
+
+        /*Simpan Data user ke Database*/
         btnSimpan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                TambahData();
-
+                if (update == 1) {
+                    UpdateData();
+                } else {
+                    TambahData();
+                }
             }
         });
+    }
+
+    private void UpdateData() {
+
+        final String nama = inputNama.getText().toString();
+        final String jenisKelamin = setKelamin.getText().toString();
+
+        if (isChanged) {
+
+            user_id = mAuth.getCurrentUser().getUid();
+            StorageReference imageUrl = storageReference.child("profile_image").child(user_id + ".jpg");
+            imageUrl.putFile(mainImageURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        updateStore(task, nama, jenisKelamin);
+                    }
+                }
+            });
+
+        } else {
+            updateStore(null, nama, jenisKelamin);
+        }
+
+    }
+
+    private void updateStore(Task<UploadTask.TaskSnapshot> task, String nama, String jenisKelamin) {
+
+        Uri download_uri;
+        if (task != null) {
+            download_uri = task.getResult().getDownloadUrl();
+        } else {
+            download_uri = mainImageURI;
+        }
+
+        Map<String, Object> updateMap = new HashMap<>();
+        updateMap.put("nama_user", nama);
+        updateMap.put("jenis_kelamin", jenisKelamin);
+        updateMap.put("image", String.valueOf(download_uri));
+
+        firestore.collection("users").document(user_id).update(updateMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+
+                            Intent mainActivity = new Intent(SetupActivity.this, ProfileActivity.class);
+                            startActivity(mainActivity);
+                            finish();
+
+                        }
+                    }
+                });
     }
 
     /*Proses menambahkan data users*/
@@ -165,7 +278,8 @@ public class SetupActivity extends AppCompatActivity {
             downloadUri = mainImageURI;
         }
 
-
+        String level = "pending";
+        String verifikasi = "invalid";
         Map<String, String> userMap = new HashMap<>();
         userMap.put("npm", npm);
         userMap.put("email", email);
@@ -173,15 +287,23 @@ public class SetupActivity extends AppCompatActivity {
         userMap.put("jenis_kelamin", jenisKelamin);
         userMap.put("fakultas", fakultas);
         userMap.put("image", String.valueOf(downloadUri));
+        userMap.put("level", level);
+        userMap.put("verifikasi", verifikasi);
 
-        firestore.collection("Users").document(user_id).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+        firestore.collection("users").document(user_id).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
 
-                    Intent mainActivity = new Intent(SetupActivity.this, MainActivity.class);
-                    startActivity(mainActivity);
-                    finish();
+                    if (task.isSuccessful()) {
+                        Intent mainActivity = new Intent(SetupActivity.this, MainActivity.class);
+                        startActivity(mainActivity);
+                        finish();
+                        Toast.makeText(SetupActivity.this, "Data berhasil disimpan", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(SetupActivity.this, "Data gagal disimpan", Toast.LENGTH_SHORT).show();
+                    }
+
 
                 }
 

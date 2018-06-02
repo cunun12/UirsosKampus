@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -27,6 +28,7 @@ import com.uirsos.www.uirsoskampus.Adapter.AdapterStatus;
 import com.uirsos.www.uirsoskampus.POJO.Status_PostList;
 import com.uirsos.www.uirsoskampus.POJO.User;
 import com.uirsos.www.uirsoskampus.R;
+import com.uirsos.www.uirsoskampus.SignUp.RegisterActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,13 +116,15 @@ public class StatusFragment extends Fragment {
             }
         });
 
-        Query firstQuery = firebaseFirestore.collection("post_user")
+        Query firstQuery = firebaseFirestore.collection("posting")
                 .orderBy("timestamp", Query.Direction.ASCENDING);
         firstQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
 
-                if (!documentSnapshots.isEmpty()) {
+                if (documentSnapshots.isEmpty()) {
+                    Toast.makeText(getActivity(), "Data masih kosong", Toast.LENGTH_SHORT).show();
+                } else {
                     if (isFirstPageFirstLoad) {
 
                         lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
@@ -136,7 +140,7 @@ public class StatusFragment extends Fragment {
                             final Status_PostList dataPost = doc.getDocument().toObject(Status_PostList.class).withId(postId);
 
                             String blogUserId = doc.getDocument().getString("user_id");
-                            firebaseFirestore.collection("Users").document(blogUserId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            firebaseFirestore.collection("users").document(blogUserId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
@@ -163,9 +167,6 @@ public class StatusFragment extends Fragment {
                         }
 
                     }
-
-                } else {
-                    Log.d(TAG, "onEvent: Data Kosong");
                 }
 
                 isFirstPageFirstLoad = false;

@@ -34,5 +34,7 @@
     <string name="fakultas">Fakultas</string>
     <string name="no_Connection">Tidak ada jaringan</string>
     <string name="koneksi_gagal">No Connection To Server</string>
+    <string name="verifikasi_akun">Verifikasi Akun</string>
+    <string name="descript">Dengan mengirimkan photo KTM dan NPM anda mengajukan untuk terdaftar sebagai mahasiswa</string>
 
 </resources>

@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,6 +25,7 @@ import com.uirsos.www.uirsoskampus.Adapter.AdapterHistory;
 import com.uirsos.www.uirsoskampus.POJO.Status_PostList;
 import com.uirsos.www.uirsoskampus.R;
 import com.uirsos.www.uirsoskampus.SignUp.LoginActivity;
+import com.uirsos.www.uirsoskampus.StatusInfo.MainActivity;
 import com.uirsos.www.uirsoskampus.Utils.BottomNavigationHelper;
 import com.uirsos.www.uirsoskampus.Utils.GridImageDecoration;
 
@@ -35,14 +37,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class FriendActivity extends AppCompatActivity {
 
     private static final int ACTIVITY_NUM = 1;
-
+    BottomNavigationViewEx defaultBottomNav, adminBottomNav;
     //widget
     private CircleImageView imgProfile;
     private TextView textNpm, textNama, textGender, textStatus, textFakultas;
     private RecyclerView listHistori;
     private List<Status_PostList> postHistory;
     private AdapterHistory adapterHistory;
-
     //firebase
     private FirebaseAuth mAuth;
     private FirebaseFirestore firebaseFirestore;
@@ -65,6 +66,9 @@ public class FriendActivity extends AppCompatActivity {
         textStatus = findViewById(R.id.txtStatusUser);
         textFakultas = findViewById(R.id.txtFakultas);
         listHistori = findViewById(R.id.historyUser);
+        defaultBottomNav = (BottomNavigationViewEx) findViewById(R.id.defaultBottom);
+        adminBottomNav = (BottomNavigationViewEx) findViewById(R.id.adminNavbar);
+
 
         //firebase
         mAuth = FirebaseAuth.getInstance();
@@ -76,7 +80,7 @@ public class FriendActivity extends AppCompatActivity {
         postHistory = new ArrayList<>();
         adapterHistory = new AdapterHistory(postHistory);
         listHistori.setLayoutManager(new GridLayoutManager(this, 4));
-        listHistori.addItemDecoration(new GridImageDecoration(getApplicationContext(), 2,2,2,2));
+        listHistori.addItemDecoration(new GridImageDecoration(getApplicationContext(), 2, 2, 2, 2));
         listHistori.setAdapter(adapterHistory);
 
         loadHistory();
@@ -116,11 +120,11 @@ public class FriendActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()){
+                        if (task.isSuccessful()) {
 
                             String npm = task.getResult().getString("npm");
                             String nama = task.getResult().getString("nama_user");
-                            String gender= task.getResult().getString("jenis_kelamin");
+                            String gender = task.getResult().getString("jenis_kelamin");
                             String fakultas = task.getResult().getString("fakultas");
                             String image = task.getResult().getString("image");
 
@@ -144,12 +148,29 @@ public class FriendActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
 
-        BottomNavigationViewEx bottomNavigationView = (BottomNavigationViewEx) findViewById(R.id.bottomNavBar);
-        BottomNavigationHelper.setupBottomNavigationView(bottomNavigationView);
-        BottomNavigationHelper.enableNavigation(FriendActivity.this, bottomNavigationView);
-        Menu menu = bottomNavigationView.getMenu();
-        MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
-        menuItem.setChecked(true);
+        firebaseFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                String level = task.getResult().getString("level");
+                if (level.equals("admin")) {
+                    defaultBottomNav.setVisibility(View.GONE);
+                    adminBottomNav.setVisibility(View.VISIBLE);
+                    BottomNavigationHelper.setupBottomNavigationView(adminBottomNav);
+                    BottomNavigationHelper.enableNavigation(FriendActivity.this, adminBottomNav);
+                    Menu menu = adminBottomNav.getMenu();
+                    MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
+                    menuItem.setChecked(true);
+
+                } else {
+                    //jika level bukan admin maka menu nya cuman ada menu home dan profile
+                    BottomNavigationHelper.setupBottomNavigationView(defaultBottomNav);
+                    BottomNavigationHelper.enableNavigation(FriendActivity.this, defaultBottomNav);
+                    Menu menu = defaultBottomNav.getMenu();
+                    MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
+                    menuItem.setChecked(true);
+                }
+            }
+        });
     }
 
 
