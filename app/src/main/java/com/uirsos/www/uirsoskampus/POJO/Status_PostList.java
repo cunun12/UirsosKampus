@@ -8,18 +8,18 @@ import java.util.Date;
 
 public class Status_PostList extends PostId{
 
-    private String user_id, desc, image_thumb, image_post;
-    private String Timestamp;
+    private String user_id, deskripsi, image_thumb, imagePost;
+    private String postTime;
 
     public Status_PostList() {
     }
 
-    public Status_PostList(String user_id, String desc, String image_thumb, String image_post, String timestamp) {
+    public Status_PostList(String user_id, String deskripsi, String image_thumb, String imagePost, String postTime) {
         this.user_id = user_id;
-        this.desc = desc;
+        this.deskripsi = deskripsi;
         this.image_thumb = image_thumb;
-        this.image_post = image_post;
-        this.Timestamp = timestamp;
+        this.imagePost = imagePost;
+        this.postTime = postTime;
     }
 
     public String getUser_id() {
@@ -30,12 +30,12 @@ public class Status_PostList extends PostId{
         this.user_id = user_id;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getDeskripsi() {
+        return deskripsi;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setDeskripsi(String deskripsi) {
+        this.deskripsi = deskripsi;
     }
 
     public String getImage_thumb() {
@@ -46,19 +46,19 @@ public class Status_PostList extends PostId{
         this.image_thumb = image_thumb;
     }
 
-    public String getImage_post() {
-        return image_post;
+    public String getImagePost() {
+        return imagePost;
     }
 
-    public void setImage_post(String image_post) {
-        this.image_post = image_post;
+    public void setImagePost(String imagePost) {
+        this.imagePost = imagePost;
     }
 
-    public String getTimestamp() {
-        return Timestamp;
+    public String getPostTime() {
+        return postTime;
     }
 
-    public void setTimestamp(String timestamp) {
-        Timestamp = timestamp;
+    public void setPostTime(String postTime) {
+        this.postTime = postTime;
     }
 }

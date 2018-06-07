@@ -36,19 +36,17 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <RelativeLayout
-        android:id="@+id/relatifRv"
-        android:layout_below="@+id/barlayout"
-        android:layout_above="@+id/relatif"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/list_komentar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fadeScrollbars="true"/>
-    </RelativeLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list_komentar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relatif"
+        android:layout_marginTop="60dp"
+        android:clipChildren="true"
+        android:clipToPadding="true"
+        app:reverseLayout="true"
+        app:stackFromEnd="true" />
 
     <RelativeLayout
         android:id="@+id/relatif"

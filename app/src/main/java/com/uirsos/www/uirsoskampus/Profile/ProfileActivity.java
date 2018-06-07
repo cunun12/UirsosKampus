@@ -1,10 +1,6 @@
 package com.uirsos.www.uirsoskampus.Profile;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,12 +28,11 @@ import com.uirsos.www.uirsoskampus.Adapter.AdapterHistory;
 import com.uirsos.www.uirsoskampus.POJO.Status_PostList;
 import com.uirsos.www.uirsoskampus.R;
 import com.uirsos.www.uirsoskampus.SignUp.LoginActivity;
-import com.uirsos.www.uirsoskampus.SignUp.VerifikasiAccount;
+import com.uirsos.www.uirsoskampus.Verifikasi.VerifikasiAccount;
 import com.uirsos.www.uirsoskampus.Utils.BottomNavigationHelper;
 import com.uirsos.www.uirsoskampus.Utils.GridImageDecoration;
 
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,7 +108,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void loadHistory() {
 
-        firebaseFirestore.collection("post_user")
+        firebaseFirestore.collection("posting")
                 .whereEqualTo("user_id", user_id)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -125,8 +120,9 @@ public class ProfileActivity extends AppCompatActivity {
 
                                 Status_PostList dataitem = new Status_PostList();
                                 dataitem.setUser_id(document.getString("user_id"));
-                                dataitem.setImage_post(document.getString("image_post"));
-                                dataitem.setDesc(document.getString("desc"));
+                                dataitem.setImagePost(document.getString("imagePost"));
+                                dataitem.setDeskripsi(document.getString("deskripsi"));
+                                dataitem.setPostTime(document.getString("postTime"));
                                 postHistory.add(dataitem);
                             }
                             adapterHistory.notifyDataSetChanged();
@@ -148,7 +144,7 @@ public class ProfileActivity extends AppCompatActivity {
                             String nama = task.getResult().getString("nama_user");
                             String gender = task.getResult().getString("jenis_kelamin");
                             String fakultas = task.getResult().getString("fakultas");
-                            String image = task.getResult().getString("image");
+                            String image = task.getResult().getString("imagePic");
 
                             textNpm.setText(npm);
                             textNama.setText(nama);
@@ -161,6 +157,17 @@ public class ProfileActivity extends AppCompatActivity {
                                     .setDefaultRequestOptions(placeholderrequest)
                                     .load(image)
                                     .into(imgProfile);
+
+                            firebaseFirestore.collection("users/"+user_id+"/status").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    for (DocumentSnapshot doc : task.getResult()){
+                                        String status = doc.getString("status");
+
+                                        textStatus.setText(status);
+                                    }
+                                }
+                            });
                         }
                     }
                 });
@@ -231,6 +238,8 @@ public class ProfileActivity extends AppCompatActivity {
             case R.id.verifikasi:
 
                 Intent intentVerifikasi = new Intent(ProfileActivity.this, VerifikasiAccount.class);
+                intentVerifikasi.putExtra("npm", textNpm.getText());
+                intentVerifikasi.putExtra("fakultas", textFakultas.getText());
                 startActivity(intentVerifikasi);
 
                 return true;

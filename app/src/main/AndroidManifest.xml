@@ -36,7 +36,8 @@
         <activity android:name=".Profile.ViewPostActivity" />
         <activity android:name=".Profile.FriendActivity" />
         <activity android:name=".Profile.StatusActivity" />
-        <activity android:name=".SignUp.VerifikasiAccount"></activity>
+        <activity android:name=".Verifikasi.VerifikasiAccount" />
+        <activity android:name=".StatusInfo.DetailBerita"></activity>
     </application>
 
 </manifest>

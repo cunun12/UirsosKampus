@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.codesgood.views.JustifiedTextView;
 import com.uirsos.www.uirsoskampus.POJO.DataItemBerita;
 import com.uirsos.www.uirsoskampus.R;
+import com.uirsos.www.uirsoskampus.StatusInfo.DetailBerita;
 
 import java.util.List;
 
@@ -56,6 +57,20 @@ public class AdapterBerita extends RecyclerView.Adapter<AdapterBerita.HolderBeri
                 .load(itemBerita.get(position).getImage())
                 .into(holder.imageBerita);
 
+        holder.mItemBerita.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(view.getContext(), DetailBerita.class);
+                i.putExtra("getTanggal", itemBerita.get(position).getWaktu());
+                i.putExtra("getJudul", itemBerita.get(position).getJudul());
+                i.putExtra("getDeskripsi", itemBerita.get(position).getDeskripsi());
+                i.putExtra("getInfo", itemBerita.get(position).getInfo());
+                i.putExtra("getImageBerita", itemBerita.get(position).getImage());
+                view.getContext().startActivity(i);
+
+            }
+        });
+
 //        holder.mItemBerita.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -89,9 +104,12 @@ public class AdapterBerita extends RecyclerView.Adapter<AdapterBerita.HolderBeri
         private TextView infoBerita, judulBerita, tanggalBerita;
         private JustifiedTextView deskripsiBerita;
         private ImageView imageBerita;
+        private CardView mItemBerita;
+
         public HolderBerita(View itemView) {
             super(itemView);
 
+            mItemBerita = itemView.findViewById(R.id.itemBerita);
             imageBerita = itemView.findViewById(R.id.image_berita);
             infoBerita = itemView.findViewById(R.id.info_Berita);
             judulBerita = itemView.findViewById(R.id.judul_Berita);

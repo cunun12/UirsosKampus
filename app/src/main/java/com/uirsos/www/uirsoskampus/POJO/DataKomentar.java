@@ -10,15 +10,15 @@ import java.util.Date;
 public class DataKomentar {
 
     private String user_id, komentar;
-    private String timestamp;
+    private String komentarTime;
 
     public DataKomentar() {
     }
 
-    public DataKomentar(String user_id, String komentar, String timestamp) {
+    public DataKomentar(String user_id, String komentar, String komentarTime) {
         this.user_id = user_id;
         this.komentar = komentar;
-        this.timestamp = timestamp;
+        this.komentarTime = komentarTime;
     }
 
     public String getUser_id() {
@@ -37,11 +37,11 @@ public class DataKomentar {
         this.komentar = komentar;
     }
 
-    public String getTimestamp() {
-        return timestamp;
+    public String getKomentarTime() {
+        return komentarTime;
     }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public void setKomentarTime(String komentarTime) {
+        this.komentarTime = komentarTime;
     }
 }

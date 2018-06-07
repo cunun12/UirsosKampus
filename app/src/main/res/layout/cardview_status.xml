@@ -24,6 +24,7 @@
                 android:background="@color/bottomWhite">
 
                 <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/image_pic"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"

@@ -1,7 +1,5 @@
 package com.uirsos.www.uirsoskampus.StatusInfo;
 
-import android.content.Intent;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,7 +19,6 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -51,10 +47,10 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
     List<DataKomentar> listKomentar;
     List<User> listUser;
     AdapterKomentar adapterKomentar;
+    List<String> strings;
     private String idPost;
     private ImageView sendKomentar;
     private EditText textKomentar;
-
     /*Firebase*/
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
@@ -81,12 +77,14 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
 
         /*Set Adapter*/
         listKomentar = new ArrayList<>();
+        strings = new ArrayList<>();
         listUser = new ArrayList<>();
         adapterKomentar = new AdapterKomentar(listKomentar, listUser);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
-        linearLayoutManager.scrollToPosition(listKomentar.size()-1);
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
         rvKomentar.setLayoutManager(linearLayoutManager);
         rvKomentar.setAdapter(adapterKomentar);
 
@@ -94,11 +92,12 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
+
     private void komentarView() {
 
         if (firebaseAuth.getCurrentUser() != null) {
 
-            firebaseFirestore.collection("post_user/" + idPost + "/komentar").orderBy("timestamp", Query.Direction.ASCENDING)
+            firebaseFirestore.collection("posting/" + idPost + "/komentar").orderBy("komentarTime", Query.Direction.ASCENDING)
                     .addSnapshotListener(KomentarActivity.this, new EventListener<QuerySnapshot>() {
                         @Override
                         public void onEvent(@Nullable QuerySnapshot documentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -110,19 +109,19 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
                                         final DataKomentar komentar = doc.getDocument().toObject(DataKomentar.class);
 
                                         String komentarUserId = doc.getDocument().getString("user_id");
-                                        Log.d("komentarActivity", "onEvent: "+komentarUserId);
-                                        firebaseFirestore.collection("Users").document(komentarUserId).get()
-                                                .addOnCompleteListener(KomentarActivity.this ,new OnCompleteListener<DocumentSnapshot>() {
+                                        Log.d("komentarActivity", "onEvent: " + komentarUserId);
+                                        firebaseFirestore.collection("users").document(komentarUserId).get()
+                                                .addOnCompleteListener(KomentarActivity.this, new OnCompleteListener<DocumentSnapshot>() {
                                                     @Override
                                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                         if (task.isSuccessful()) {
 
                                                             User user = task.getResult().toObject(User.class);
 
-                                                            Log.d("KomentarActivity", "onComplete: " +user);
+                                                            Log.d("KomentarActivity", "onComplete: " + user);
                                                             listUser.add(user);
                                                             listKomentar.add(komentar);
-                                                            linearLayoutManager.scrollToPosition(listKomentar.size()-1);
+                                                            linearLayoutManager.scrollToPosition(listKomentar.size() - 1);
                                                         }
                                                         adapterKomentar.notifyDataSetChanged();
                                                     }
@@ -163,19 +162,20 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
             HashMap<String, Object> komentar = new HashMap<>();
             komentar.put("user_id", user_id);
             komentar.put("komentar", getKomentar);
-            komentar.put("timestamp", getTimestamp());
+            komentar.put("komentarTime", getTimestamp());
 
-            firebaseFirestore.collection("post_user/" + idPost + "/komentar").add(komentar)
+            firebaseFirestore.collection("posting/" + idPost + "/komentar").add(komentar)
                     .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentReference> task) {
                             if (task.isSuccessful()) {
+
                                 textKomentar.setText("");
                                 textKomentar.requestFocus();
-                                linearLayoutManager.scrollToPosition(listKomentar.size()-1);
+                                linearLayoutManager.scrollToPosition(listKomentar.size() - 1);
                             } else {
-                                String Error =  task.getException().getMessage();
-                                Log.d("KomentarActivity", "onComplete: "+Error);
+                                String Error = task.getException().getMessage();
+                                Log.d("KomentarActivity", "onComplete: " + Error);
                             }
                         }
                     });
@@ -183,7 +183,7 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    private String getTimestamp(){
+    private String getTimestamp() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
         return sdf.format(new Date());

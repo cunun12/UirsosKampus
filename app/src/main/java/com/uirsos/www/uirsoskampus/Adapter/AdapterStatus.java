@@ -1,5 +1,6 @@
 package com.uirsos.www.uirsoskampus.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -83,21 +84,21 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
         final String postId = postLists.get(position).PostId;
         final String currentUserId = firebaseAuth.getCurrentUser().getUid();
 
-        String desc_data = postLists.get(position).getDesc();
+        String desc_data = postLists.get(position).getDeskripsi();
         holder.setDescText(desc_data);
 
-        String imageUrl = postLists.get(position).getImage_post();
+        String imageUrl = postLists.get(position).getImagePost();
         holder.setPostImage(imageUrl);
 
         final String user_id = postLists.get(position).getUser_id();
 
         String userName = userList.get(position).getNama_user();
-        String userImage = userList.get(position).getImage();
-        holder.setUserData(userName);
+        String userImage = userList.get(position).getImagePic();
+        holder.setUserData(userName, userImage);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
-        String postTimestamp = postLists.get(position).getTimestamp();
+        String postTimestamp = postLists.get(position).getPostTime();
         Date timestamp;
         long detik = 0;
         long menit = 0;
@@ -143,7 +144,7 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
     /*Start Fitur Like*/
 
         //getCount
-        firebaseFirestore.collection("post_user/" + postId + "/Likes").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        firebaseFirestore.collection("posting/" + postId + "/Likes").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
 
@@ -162,7 +163,7 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
         });
 
         //imageLike
-        firebaseFirestore.collection("post_user/" + postId + "/Likes").document(currentUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        firebaseFirestore.collection("posting/" + postId + "/Likes").document(currentUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
 
@@ -191,20 +192,20 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
             @Override
             public void onClick(View v) {
 
-                firebaseFirestore.collection("post_user/" + postId + "/Likes").document(currentUserId)
+                firebaseFirestore.collection("posting/" + postId + "/Likes").document(currentUserId)
                         .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (!task.getResult().exists()) {
 
                             Map<String, Object> likeMap = new HashMap<>();
-                            likeMap.put("timestamp", FieldValue.serverTimestamp());
+                            likeMap.put("likesTime", FieldValue.serverTimestamp());
 
-                            firebaseFirestore.collection("post_user/" + postId + "/Likes").document(currentUserId).set(likeMap);
+                            firebaseFirestore.collection("posting/" + postId + "/Likes").document(currentUserId).set(likeMap);
 
                         } else {
 
-                            firebaseFirestore.collection("post_user/" + postId + "/Likes").document(currentUserId).delete();
+                            firebaseFirestore.collection("posting/" + postId + "/Likes").document(currentUserId).delete();
 
                         }
                     }
@@ -304,15 +305,19 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
             postLikeCount.setText(count + " Likes");
         }
 
-        public void setUserData(String name) {
+        @SuppressLint("CheckResult")
+        public void setUserData(String name, String image) {
             postUserName = mView.findViewById(R.id.nama_Pengguna);
-            postUserImage = mView.findViewById(R.id.img_Profile);
+            postUserImage = mView.findViewById(R.id.image_pic);
 
             postUserName.setText(name);
-//
-//            RequestOptions requestOptions = new RequestOptions();
-//            requestOptions.placeholder(R.drawable.defaulticon);
-//            Glide.with(context.getApplicationContext()).applyDefaultRequestOptions(requestOptions).load(image).into(postUserImage);
+
+            RequestOptions placeholderrequest = new RequestOptions();
+            placeholderrequest.placeholder(R.drawable.defaulticon);
+            Glide.with(context)
+                    .applyDefaultRequestOptions(placeholderrequest)
+                    .load(image)
+                    .into(postUserImage);
         }
     }
 }

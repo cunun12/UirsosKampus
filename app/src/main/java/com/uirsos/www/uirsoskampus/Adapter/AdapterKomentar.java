@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.uirsos.www.uirsoskampus.POJO.DataKomentar;
@@ -21,6 +23,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.content.ContentValues.TAG;
 
@@ -59,12 +63,12 @@ public class AdapterKomentar extends RecyclerView.Adapter<AdapterKomentar.ViewKo
         holder.setKomentar(getKomentar);
 
         String username = listUser.get(position).getNama_user();
-        String image = listUser.get(position).getImage();
-        holder.setUser(username);
+        String image = listUser.get(position).getImagePic();
+        holder.setUser(username, image);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
-        String postTimestamp = listKomentar.get(position).getTimestamp();
+        String postTimestamp = listKomentar.get(position).getKomentarTime();
         Date timestamp;
         long detik = 0;
         long menit = 0;
@@ -83,7 +87,10 @@ public class AdapterKomentar extends RecyclerView.Adapter<AdapterKomentar.ViewKo
             e.printStackTrace();
         }
 
-        if (detik < 60 && detik>0) {
+        if (detik<1) {
+            Log.d(TAG, "onBindViewHolder: detik" + detik);
+            holder.setTime("Baru");
+        } else if (detik < 60 && detik>0) {
             Log.d(TAG, "onBindViewHolder: detik" + detik);
             String postDetik = String.valueOf(detik);
             holder.setTime(postDetik + " Detik yang Lalu");
@@ -113,6 +120,7 @@ public class AdapterKomentar extends RecyclerView.Adapter<AdapterKomentar.ViewKo
 
         private View mView;
         private TextView textKomentar, textWaktu, textUsername;
+        private CircleImageView komentarPic;
 
         public ViewKomentar(View itemView) {
             super(itemView);
@@ -121,10 +129,18 @@ public class AdapterKomentar extends RecyclerView.Adapter<AdapterKomentar.ViewKo
 
         }
 
-        public void setUser(String username){
+        public void setUser(String username, String image){
 
             textUsername = mView.findViewById(R.id.nama_User);
+            komentarPic  = mView.findViewById(R.id.image_pic);
             textUsername.setText(username);
+
+            RequestOptions placeholderrequest = new RequestOptions();
+            placeholderrequest.placeholder(R.drawable.defaulticon);
+            Glide.with(context)
+                    .applyDefaultRequestOptions(placeholderrequest)
+                    .load(image)
+                    .into(komentarPic);
 
         }
 

@@ -1,5 +1,6 @@
 package com.uirsos.www.uirsoskampus.Profile;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,6 +41,7 @@ public class FriendActivity extends AppCompatActivity {
 
     private static final int ACTIVITY_NUM = 1;
     BottomNavigationViewEx defaultBottomNav, adminBottomNav;
+    String userId;
     //widget
     private CircleImageView imgProfile;
     private TextView textNpm, textNama, textGender, textStatus, textFakultas;
@@ -68,12 +72,16 @@ public class FriendActivity extends AppCompatActivity {
         listHistori = findViewById(R.id.historyUser);
         defaultBottomNav = (BottomNavigationViewEx) findViewById(R.id.defaultBottom);
         adminBottomNav = (BottomNavigationViewEx) findViewById(R.id.adminNavbar);
-
+        adminBottomNav.setVisibility(View.GONE);
 
         //firebase
         mAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         user_id = mAuth.getCurrentUser().getUid();
+
+
+        Intent user = getIntent();
+        userId = user.getStringExtra("idUser");
 
         loadProfile();
 
@@ -91,8 +99,8 @@ public class FriendActivity extends AppCompatActivity {
 
     private void loadHistory() {
 
-        firebaseFirestore.collection("post_user")
-                .whereEqualTo("user_id", user_id)
+        firebaseFirestore.collection("posting")
+                .whereEqualTo("user_id", userId)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -103,8 +111,9 @@ public class FriendActivity extends AppCompatActivity {
 
                                 Status_PostList dataitem = new Status_PostList();
                                 dataitem.setUser_id(document.getString("user_id"));
-                                dataitem.setImage_post(document.getString("image_post"));
-                                dataitem.setDesc(document.getString("desc"));
+                                dataitem.setImagePost(document.getString("imagePost"));
+                                dataitem.setDeskripsi(document.getString("deskripsi"));
+                                dataitem.setPostTime(document.getString("postTime"));
                                 postHistory.add(dataitem);
                             }
                             adapterHistory.notifyDataSetChanged();
@@ -116,8 +125,10 @@ public class FriendActivity extends AppCompatActivity {
 
     private void loadProfile() {
 
-        firebaseFirestore.collection("Users").document(user_id).get()
+
+        firebaseFirestore.collection("users").document(userId).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @SuppressLint("CheckResult")
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
@@ -126,19 +137,30 @@ public class FriendActivity extends AppCompatActivity {
                             String nama = task.getResult().getString("nama_user");
                             String gender = task.getResult().getString("jenis_kelamin");
                             String fakultas = task.getResult().getString("fakultas");
-                            String image = task.getResult().getString("image");
+                            String image = task.getResult().getString("imagePic");
 
                             textNpm.setText(npm);
                             textNama.setText(nama);
                             textGender.setText(gender);
                             textFakultas.setText(fakultas);
 
-//                            RequestOptions placeholderrequest = new RequestOptions();
-//                            placeholderrequest.placeholder(R.drawable.defaulticon);
-//                            Glide.with(getApplicationContext())
-//                                    .setDefaultRequestOptions(placeholderrequest)
-//                                    .load(image)
-//                                    .into(imgProfile);
+                            RequestOptions placeholderrequest = new RequestOptions();
+                            placeholderrequest.placeholder(R.drawable.defaulticon);
+                            Glide.with(getApplicationContext())
+                                    .setDefaultRequestOptions(placeholderrequest)
+                                    .load(image)
+                                    .into(imgProfile);
+
+                            firebaseFirestore.collection("users/"+userId+"/status").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    for (DocumentSnapshot doc : task.getResult()){
+                                        String status = doc.getString("status");
+
+                                        textStatus.setText(status);
+                                    }
+                                }
+                            });
                         }
                     }
                 });
@@ -148,7 +170,7 @@ public class FriendActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
 
-        firebaseFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        firebaseFirestore.collection("users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 String level = task.getResult().getString("level");
@@ -162,6 +184,8 @@ public class FriendActivity extends AppCompatActivity {
                     menuItem.setChecked(true);
 
                 } else {
+                    adminBottomNav.setVisibility(View.GONE);
+                    defaultBottomNav.setVisibility(View.VISIBLE);
                     //jika level bukan admin maka menu nya cuman ada menu home dan profile
                     BottomNavigationHelper.setupBottomNavigationView(defaultBottomNav);
                     BottomNavigationHelper.enableNavigation(FriendActivity.this, defaultBottomNav);

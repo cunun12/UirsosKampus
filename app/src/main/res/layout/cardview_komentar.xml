@@ -9,9 +9,11 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
+        android:layout_alignParentTop="true"
         android:background="@drawable/backgroun_komentarbottom">
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/image_pic"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_margin="10dp"

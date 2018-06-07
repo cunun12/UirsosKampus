@@ -223,7 +223,7 @@ public class SetupActivity extends AppCompatActivity {
         Map<String, Object> updateMap = new HashMap<>();
         updateMap.put("nama_user", nama);
         updateMap.put("jenis_kelamin", jenisKelamin);
-        updateMap.put("image", String.valueOf(download_uri));
+        updateMap.put("imagePic", String.valueOf(download_uri));
 
         firestore.collection("users").document(user_id).update(updateMap)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -286,7 +286,7 @@ public class SetupActivity extends AppCompatActivity {
         userMap.put("nama_user", namaUser);
         userMap.put("jenis_kelamin", jenisKelamin);
         userMap.put("fakultas", fakultas);
-        userMap.put("image", String.valueOf(downloadUri));
+        userMap.put("imagePic", String.valueOf(downloadUri));
         userMap.put("level", level);
         userMap.put("verifikasi", verifikasi);
 

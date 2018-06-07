@@ -6,7 +6,9 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,6 +52,28 @@ import id.zelory.compressor.Compressor;
 
 public class NewPostActivity extends AppCompatActivity implements View.OnClickListener {
 
+    TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            String getKet = inputKeterangan.getText().toString().trim();
+
+            if (!getKet.isEmpty()) {
+                btnSimpan.setEnabled(true);
+            }else{
+                btnSimpan.setEnabled(false);
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+        }
+    };
+
     /*widget Firebase*/
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
@@ -90,13 +114,13 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
         user_id = mAuth.getCurrentUser().getUid();
 
         /*untuk mengambil profile dan nama*/
-        firestore.collection("Users") //nama table
+        firestore.collection("users") //nama table
                 .document(user_id).get() // menampilkan berdasarkan id user
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.getResult().exists()) {
-                            String image = task.getResult().getString("image");
+                            String image = task.getResult().getString("imagePic");
                             String nama = task.getResult().getString("nama_user");
 
                             namaUser.setText(nama);
@@ -111,6 +135,7 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
                     }
                 });
 
+        inputKeterangan.addTextChangedListener(textWatcher);
         imageBack.setOnClickListener(this);
         btnAddPhoto.setOnClickListener(this);
         btnSimpan.setOnClickListener(this);
@@ -156,9 +181,9 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
 
         final String textKet = inputKeterangan.getText().toString();
 
-        if (!TextUtils.isEmpty(textKet) && postImageURI != null) {
+        progressBar.setVisibility(View.VISIBLE);
+        if (postImageURI != null) {
 
-            progressBar.setVisibility(View.VISIBLE);
 
             final String randomImage = UUID.randomUUID().toString();
 
@@ -196,13 +221,13 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
                                 String downloadThumbUri = taskSnapshot.getDownloadUrl().toString();
 
                                 Map<String, Object> postMap = new HashMap<>();
-                                postMap.put("image_post", downloadUri);
+                                postMap.put("imagePost", downloadUri);
                                 postMap.put("image_thumb", downloadThumbUri);
-                                postMap.put("desc", textKet);
+                                postMap.put("deskripsi", textKet);
                                 postMap.put("user_id", user_id);
-                                postMap.put("timestamp", getTimestamp());
+                                postMap.put("postTime", getTimestamp());
 
-                                firestore.collection("post_user").add(postMap)
+                                firestore.collection("posting").add(postMap)
                                         .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                             @Override
                                             public void onComplete(@NonNull Task<DocumentReference> task) {
@@ -222,7 +247,6 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
 
                                             }
                                         });
-                                progressBar.setVisibility(View.GONE);
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -245,7 +269,8 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
 
         } else {
 
-            btnSimpan.setEnabled(false);
+            progressBar.setVisibility(View.GONE);
+            Toast.makeText(this, "Maaf silakan masukan gambar sebelum memposting", Toast.LENGTH_SHORT).show();
 
         }
 
@@ -268,11 +293,9 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
                 postImageURI = result.getUri();
                 imagePost.setImageURI(postImageURI);
                 if (imagePost != null) {
-                    btnSimpan.setEnabled(true);
                     cancelImage.setVisibility(View.VISIBLE);
                     imagePost.setVisibility(View.VISIBLE);
                 } else {
-                    btnSimpan.setEnabled(false);
                     cancelImage.setVisibility(View.GONE);
                     imagePost.setVisibility(View.GONE);
                 }

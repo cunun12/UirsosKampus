@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -90,7 +91,7 @@ public class StatusFragment extends Fragment {
         listStatus.setLayoutManager(new LinearLayoutManager(getContext()));
         listStatus.setAdapter(adapterStatus);
 
-        if (firebaseAuth.getCurrentUser() != null){
+        if (firebaseAuth.getCurrentUser() != null) {
 
             dataView();
 
@@ -100,24 +101,65 @@ public class StatusFragment extends Fragment {
 
     private void dataView() {
 
-        listStatus.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                Boolean reachedBottom = !recyclerView.canScrollVertically(1);
-
-                if (reachedBottom) {
-
-                    loadMorePost();
-
-                }
-
-            }
-        });
-
+//        firebaseFirestore.collection("posting").orderBy("postTime", Query.Direction.ASCENDING)
+//                .addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+//                        if (documentSnapshots.isEmpty()) {
+//                            Toast.makeText(getActivity(), "Data masih kosong", Toast.LENGTH_SHORT).show();
+//                        } else {
+//
+//                            if (isFirstPageFirstLoad) {
+//
+//                                lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
+//                                postLists.clear();
+//                                user_list.clear();
+//                            } else {
+//                                for (DocumentChange documentChange : documentSnapshots.getDocumentChanges()) {
+//                                    if (documentChange.getType() == DocumentChange.Type.ADDED) {
+//                                        String postId = documentChange.getDocument().getId();
+//                                        final Status_PostList dataPost = documentChange.getDocument().toObject(Status_PostList.class).withId(postId);
+//
+//                                        String userId = documentChange.getDocument().getString("user_id");
+//
+//                                        firebaseFirestore.collection("users").document(userId).get()
+//                                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                                                    @Override
+//                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                                                        if (task.isSuccessful()) {
+//                                                            User user = task.getResult().toObject(User.class);
+//                                                            postLists.add(dataPost);
+//                                                            user_list.add(user);
+//                                                        }
+//                                                        adapterStatus.notifyDataSetChanged();
+//                                                    }
+//
+//                                                });
+//                                    }
+//                                }
+//                            }
+//
+//                        }
+//                    }
+//                });
+//        listStatus.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//
+//                Boolean reachedBottom = !recyclerView.canScrollVertically(1);
+//
+//                if (reachedBottom) {
+//
+////                    loadMorePost();
+//
+//                }
+//
+//            }
+//        });
+//
         Query firstQuery = firebaseFirestore.collection("posting")
-                .orderBy("timestamp", Query.Direction.ASCENDING);
+                .orderBy("postTime", Query.Direction.ASCENDING);
         firstQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
@@ -181,8 +223,8 @@ public class StatusFragment extends Fragment {
     public void loadMorePost() {
 
         if (firebaseAuth.getCurrentUser() != null) {
-            Query nextQuery = firebaseFirestore.collection("post_user")
-                    .orderBy("timestamp", Query.Direction.ASCENDING)
+            Query nextQuery = firebaseFirestore.collection("posting")
+                    .orderBy("postTime", Query.Direction.DESCENDING)
                     .startAfter(lastVisible).limit(3);
 
             nextQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
@@ -198,7 +240,7 @@ public class StatusFragment extends Fragment {
                                 String postId = doc.getDocument().getId();
                                 final Status_PostList dataPost = doc.getDocument().toObject(Status_PostList.class).withId(postId);
                                 String blogUserId = doc.getDocument().getString("user_id");
-                                firebaseFirestore.collection("Users").document(blogUserId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                firebaseFirestore.collection("users").document(blogUserId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 

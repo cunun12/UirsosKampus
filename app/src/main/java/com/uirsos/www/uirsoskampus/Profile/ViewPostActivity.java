@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
@@ -29,6 +30,7 @@ import com.uirsos.www.uirsoskampus.Adapter.AdapterStatus;
 import com.uirsos.www.uirsoskampus.POJO.Status_PostList;
 import com.uirsos.www.uirsoskampus.POJO.User;
 import com.uirsos.www.uirsoskampus.R;
+import com.uirsos.www.uirsoskampus.SignUp.LoginActivity;
 import com.uirsos.www.uirsoskampus.StatusInfo.KomentarActivity;
 
 import java.text.SimpleDateFormat;
@@ -45,7 +47,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ViewPostActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String LOG_TAG = "ViewPost";
+    private static final String TAG = "ViewPost";
     /*widget*/
     CircleImageView profileImage;
     private TextView textNama, textWaktu, textDesc, postLikeCount, hapus;
@@ -58,7 +60,7 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     private String currentUserId, userId;
-    private String userImage, postUserImage, descImage, userName, postId;
+    private String userImage, postUserImage, descImage, postTime, userName, postId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,7 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
         backIntent = findViewById(R.id.backArrow);
         hapus = findViewById(R.id.hapus);
 
+
 //        rvPostUser = findViewById(R.id.rvPost);
 
         /*Firebase*/
@@ -90,10 +93,28 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
         userImage = post.getStringExtra("imageuser");
         postUserImage = post.getStringExtra("imagepost");
         descImage = post.getStringExtra("desc");
+        postTime = post.getStringExtra("posttime");
         postId = post.getStringExtra("postId");
         userId = post.getStringExtra("userId");
 
+        Log.d(TAG, "onCreate: userId " +userId);
+
+        Log.d(TAG, "onCreate: currendUserID " +currentUserId);
+
+        if (!currentUserId.equals(userId)){
+            Log.d(TAG, "onCreate: Hapus Hilang");
+            hapus.setVisibility(View.GONE);
+        } else{
+            Log.d(TAG, "onCreate: Hapus Hilang");
+            hapus.setVisibility(View.VISIBLE);
+        }
+
+        tanggalDate(postTime);
         textNama.setText(userName);
+        Glide.with(getApplicationContext())
+                .load(userImage)
+                .into(profileImage);
+
         textDesc.setText(descImage);
 
         Glide.with(getApplicationContext())
@@ -105,14 +126,15 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
         lineLike.setOnClickListener(this);
         backIntent.setOnClickListener(this);
         hapus.setOnClickListener(this);
+
+        fitureLikes();
     }
 
-    private void likeToggle() {
-
-            /*Start Fitur Like*/
+    private void fitureLikes() {
+                    /*Start Fitur Like*/
 
         //getCount
-        firebaseFirestore.collection("post_user/" + postId + "/Likes").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        firebaseFirestore.collection("posting/" + postId + "/Likes").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
@@ -132,13 +154,13 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
         });
 
         //imageLike
-        firebaseFirestore.collection("post_user/" + postId + "/Likes").document(currentUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        firebaseFirestore.collection("posting/" + postId + "/Likes").document(currentUserId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
 
                 if (firebaseAuth.getCurrentUser() != null) {
                     if (e != null) {
-                        Log.w(LOG_TAG, ":onEvent", e);
+                        Log.w(TAG, ":onEvent", e);
                         return;
                     }
                     if (documentSnapshot.exists()) {
@@ -155,36 +177,8 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
                 }
             }
         });
-
-        //touch image
-        lineLike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                firebaseFirestore.collection("post_user/" + postId + "/Likes").document(currentUserId)
-                        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (!task.getResult().exists()) {
-
-                            Map<String, Object> likeMap = new HashMap<>();
-                            likeMap.put("timestamp", FieldValue.serverTimestamp());
-
-                            firebaseFirestore.collection("post_user/" + postId + "/Likes").document(currentUserId).set(likeMap);
-
-                        } else {
-
-                            firebaseFirestore.collection("post_user/" + postId + "/Likes").document(currentUserId).delete();
-
-                        }
-                    }
-                });
-            }
-        });
-
-    /*End Like*/
-
     }
+
 
     @Override
     public void onClick(View view) {
@@ -198,7 +192,30 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
                 break;
 
             case R.id.like_Pengguna:
-                likeToggle();
+                lineLike.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        firebaseFirestore.collection("posting/" + postId + "/Likes").document(currentUserId)
+                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (!task.getResult().exists()) {
+
+                                    Map<String, Object> likeMap = new HashMap<>();
+                                    likeMap.put("likeTime", FieldValue.serverTimestamp());
+
+                                    firebaseFirestore.collection("posting/" + postId + "/Likes").document(currentUserId).set(likeMap);
+
+                                } else {
+
+                                    firebaseFirestore.collection("posting/" + postId + "/Likes").document(currentUserId).delete();
+
+                                }
+                            }
+                        });
+                    }
+                });
                 break;
 
             case R.id.backArrow:
@@ -219,13 +236,13 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
 
             case R.id.hapus:
                 if (currentUserId.equals(userId)) {
-                    firebaseFirestore.collection("User_Post").document(postId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    firebaseFirestore.collection("posting").document(postId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.getResult().exists()) {
-                                Log.d(LOG_TAG, "Datanya: " + task.getResult().getData());
+                                Log.d(TAG, "Datanya: " + task.getResult().getData());
 
-                                firebaseFirestore.collection("User_Post").document(postId).delete();
+                                firebaseFirestore.collection("posting").document(postId).delete();
                                 Intent iProfile = new Intent(ViewPostActivity.this, ProfileActivity.class);
                                 startActivity(iProfile);
                                 finish();
@@ -243,7 +260,6 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
     private void tanggalDate(String tanggal) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
-        String postTimestamp = tanggal;
         Date timestamp;
         long detik = 0;
         long menit = 0;
@@ -251,7 +267,7 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
         long hari = 0;
 
         try {
-            timestamp = sdf.parse(postTimestamp);
+            timestamp = sdf.parse(tanggal);
             Date now = new Date();
 
             detik = TimeUnit.MILLISECONDS.toSeconds(now.getTime() - timestamp.getTime());
@@ -263,23 +279,41 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
         }
 
         if (detik < 60) {
-            Log.d(LOG_TAG, "onBindViewHolder: detik" + detik);
+            Log.d(TAG, "onBindViewHolder: detik" + detik);
             String postDetik = String.valueOf(detik);
             textWaktu.setText(postDetik + " Detik yang lalu");
         } else if (menit < 60) {
-            Log.d(LOG_TAG, "onBindViewHolder: menit" + menit);
+            Log.d(TAG, "onBindViewHolder: menit" + menit);
             String postMenit = String.valueOf(menit);
             textWaktu.setText(postMenit + " Menit yang lalu");
         } else if (jam < 24) {
-            Log.d(LOG_TAG, "onBindViewHolder: jam" + jam);
+            Log.d(TAG, "onBindViewHolder: jam" + jam);
             String postJam = String.valueOf(jam);
             textWaktu.setText(postJam + " Jam yang lalu");
         } else if (hari < jam) {
-            Log.d(LOG_TAG, "onBindViewHolder: hari" + hari);
+            Log.d(TAG, "onBindViewHolder: hari" + hari);
             String postHari = String.valueOf(hari);
             textWaktu.setText(postHari + " Hari yang lalu");
         } else {
-            textWaktu.setText(postTimestamp);
+            textWaktu.setText(tanggal);
         }
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser == null) {
+            sendToLogin();
+        }
+    }
+
+    private void sendToLogin() {
+
+        Intent loginIntent = new Intent(ViewPostActivity.this, LoginActivity.class);
+        startActivity(loginIntent);
+        finish();
     }
 }

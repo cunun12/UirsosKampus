@@ -5,22 +5,22 @@ package com.uirsos.www.uirsoskampus.POJO;
  */
 
 public class User {
-    public String image, nama_user;
+    public String imagePic, nama_user;
 
     public User() {
     }
 
-    public User(String image, String nama_user) {
-        this.image = image;
+    public User(String imagePic, String nama_user) {
+        this.imagePic = imagePic;
         this.nama_user = nama_user;
     }
 
-    public String getImage() {
-        return image;
+    public String getImagePic() {
+        return imagePic;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImagePic(String imagePic) {
+        this.imagePic = imagePic;
     }
 
     public String getNama_user() {

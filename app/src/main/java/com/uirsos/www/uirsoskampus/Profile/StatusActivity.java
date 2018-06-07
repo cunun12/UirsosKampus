@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.uirsos.www.uirsoskampus.R;
 
@@ -77,31 +78,40 @@ public class StatusActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String status = bioText.getText().toString();
+                final String textStatus = bioText.getText().toString();
 
-                if (!TextUtils.isEmpty(status)) {
+                if (!TextUtils.isEmpty(textStatus)) {
 
-                    String user_id = mAuth.getCurrentUser().getUid();
 
-                    Map<String, Object> statusMap = new HashMap<>();
-                    statusMap.put("status", status);
+                    final String user_id = mAuth.getCurrentUser().getUid();
 
-                    firebaseFirestore.collection("Users").document(user_id).update(statusMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
+                    firebaseFirestore.collection("users/" + user_id + "/status").document(user_id).get()
+                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (!task.getResult().exists()) {
 
-                            if (task.isSuccessful()) {
-                                Intent profileIntent = new Intent(StatusActivity.this, ProfileActivity.class);
-                                startActivity(profileIntent);
-                                finish();
+                                        Map<String, Object> statusMap = new HashMap<>();
+                                        statusMap.put("status", textStatus);
+                                        firebaseFirestore.collection("users/" + user_id + "/status").document(user_id).set(statusMap);
 
-                            } else {
-                                String error = task.getException().getMessage();
-                                Toast.makeText(StatusActivity.this, "Error = " + error, Toast.LENGTH_SHORT).show();
-                            }
+                                        Intent backProfile = new Intent(StatusActivity.this, ProfileActivity.class);
+                                        startActivity(backProfile);
+                                        finish();
 
-                        }
-                    });
+                                    } else {
+
+                                        Map<String, Object> statusMap = new HashMap<>();
+                                        statusMap.put("status", textStatus);
+                                        firebaseFirestore.collection("users/" + user_id + "/status").document(user_id).update(statusMap);
+
+                                        Intent backProfile = new Intent(StatusActivity.this, ProfileActivity.class);
+                                        startActivity(backProfile);
+                                        finish();
+
+                                    }
+                                }
+                            });
 
                 }
 
