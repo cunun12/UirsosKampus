@@ -158,10 +158,10 @@ public class ProfileActivity extends AppCompatActivity {
                                     .load(image)
                                     .into(imgProfile);
 
-                            firebaseFirestore.collection("users/"+user_id+"/status").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            firebaseFirestore.collection("users/" + user_id + "/status").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    for (DocumentSnapshot doc : task.getResult()){
+                                    for (DocumentSnapshot doc : task.getResult()) {
                                         String status = doc.getString("status");
 
                                         textStatus.setText(status);
@@ -214,13 +214,14 @@ public class ProfileActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         String verifikasi = task.getResult().getString("verifikasi");
+
                         if (!verifikasi.equals("valid")) {
                             getMenuInflater().inflate(R.menu.verifikasi_menu, menu);
                         } else {
-
                             getMenuInflater().inflate(R.menu.profile_menu, menu);
 
                         }
+
                     }
                 });
 

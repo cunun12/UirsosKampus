@@ -59,10 +59,9 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
 
-    public AdapterStatus(List<Status_PostList> postList, List<User> userList) {
+    public AdapterStatus(List<Status_PostList> postList) {
 
         this.postLists = postList;
-        this.userList = userList;
     }
 
     @NonNull
@@ -82,7 +81,7 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
         holder.setIsRecyclable(false);
 
         final String postId = postLists.get(position).PostId;
-        final String currentUserId = firebaseAuth.getCurrentUser().getUid();
+        final String currentUserId = firebaseAuth.getUid();
 
         String desc_data = postLists.get(position).getDeskripsi();
         holder.setDescText(desc_data);
@@ -92,9 +91,22 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
 
         final String user_id = postLists.get(position).getUser_id();
 
-        String userName = userList.get(position).getNama_user();
-        String userImage = userList.get(position).getImagePic();
-        holder.setUserData(userName, userImage);
+        assert currentUserId != null;
+        firebaseFirestore.collection("users").document(user_id).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                        User user= task.getResult().toObject(User.class);
+
+                        assert user != null;
+                        String userName = user.getNama_user();
+                        String userImage = user.getImagePic();
+                        holder.setUserData(userName, userImage);
+
+                    }
+                });
+
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));

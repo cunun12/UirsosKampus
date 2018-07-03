@@ -43,7 +43,6 @@ public class StatusFragment extends Fragment {
 
     /*List Data*/
     List<Status_PostList> postLists;
-    List<User> user_list;
     AdapterStatus adapterStatus;
     private RecyclerView listStatus;
     private FloatingActionButton btnAddPost;
@@ -86,8 +85,7 @@ public class StatusFragment extends Fragment {
         });
 
         postLists = new ArrayList<>();
-        user_list = new ArrayList<>();
-        adapterStatus = new AdapterStatus(postLists, user_list);
+        adapterStatus = new AdapterStatus(postLists);
         listStatus.setLayoutManager(new LinearLayoutManager(getContext()));
         listStatus.setAdapter(adapterStatus);
 
@@ -101,172 +99,90 @@ public class StatusFragment extends Fragment {
 
     private void dataView() {
 
-//        firebaseFirestore.collection("posting").orderBy("postTime", Query.Direction.ASCENDING)
-//                .addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-//                        if (documentSnapshots.isEmpty()) {
-//                            Toast.makeText(getActivity(), "Data masih kosong", Toast.LENGTH_SHORT).show();
-//                        } else {
-//
-//                            if (isFirstPageFirstLoad) {
-//
-//                                lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
-//                                postLists.clear();
-//                                user_list.clear();
-//                            } else {
-//                                for (DocumentChange documentChange : documentSnapshots.getDocumentChanges()) {
-//                                    if (documentChange.getType() == DocumentChange.Type.ADDED) {
-//                                        String postId = documentChange.getDocument().getId();
-//                                        final Status_PostList dataPost = documentChange.getDocument().toObject(Status_PostList.class).withId(postId);
-//
-//                                        String userId = documentChange.getDocument().getString("user_id");
-//
-//                                        firebaseFirestore.collection("users").document(userId).get()
-//                                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                                                    @Override
-//                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                                                        if (task.isSuccessful()) {
-//                                                            User user = task.getResult().toObject(User.class);
-//                                                            postLists.add(dataPost);
-//                                                            user_list.add(user);
-//                                                        }
-//                                                        adapterStatus.notifyDataSetChanged();
-//                                                    }
-//
-//                                                });
-//                                    }
-//                                }
-//                            }
-//
-//                        }
-//                    }
-//                });
-//        listStatus.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//
-//                Boolean reachedBottom = !recyclerView.canScrollVertically(1);
-//
-//                if (reachedBottom) {
-//
-////                    loadMorePost();
-//
-//                }
-//
-//            }
-//        });
-//
+        listStatus.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                Boolean rechadBottom = !recyclerView.canScrollVertically(1);
+
+                if (rechadBottom) {
+                    if (firebaseAuth.getCurrentUser() != null) {
+
+                        loadMorePost();
+                    }
+
+                }
+            }
+        });
+
         Query firstQuery = firebaseFirestore.collection("posting")
-                .orderBy("postTime", Query.Direction.ASCENDING);
+                .orderBy("postTime", Query.Direction.DESCENDING).limit(3);
         firstQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
             @Override
-            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-
+            public void onEvent(@javax.annotation.Nullable final QuerySnapshot documentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                assert documentSnapshots != null;
                 if (documentSnapshots.isEmpty()) {
                     Toast.makeText(getActivity(), "Data masih kosong", Toast.LENGTH_SHORT).show();
                 } else {
-                    if (isFirstPageFirstLoad) {
-
-                        lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
-                        postLists.clear();
-                        user_list.clear();
-
-                    }
+                    lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
                     for (DocumentChange doc : documentSnapshots.getDocumentChanges()) {
 
                         if (doc.getType() == DocumentChange.Type.ADDED) {
+
                             String postId = doc.getDocument().getId();
 
                             final Status_PostList dataPost = doc.getDocument().toObject(Status_PostList.class).withId(postId);
 
-                            String blogUserId = doc.getDocument().getString("user_id");
-                            firebaseFirestore.collection("users").document(blogUserId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (isFirstPageFirstLoad) {
+                                postLists.add(dataPost);
+                            } else {
+                                postLists.add(0, dataPost);
+                            }
+                        }
 
-                                    if (task.isSuccessful()) {
+                    }
+                    adapterStatus.notifyDataSetChanged();
+                }
+            }
+        });
+    }
 
-                                        User user = task.getResult().toObject(User.class);
+    private void loadMorePost() {
 
+        Query next = firebaseFirestore.collection("posting")
+                .orderBy("postTime", Query.Direction.DESCENDING)
+                .startAfter(lastVisible)
+                .limit(3);
 
-                                        if (isFirstPageFirstLoad) {
-                                            user_list.add(user);
-                                            postLists.add(dataPost);
-                                        } else {
-                                            user_list.add(0, user);
-                                            postLists.add(0, dataPost);
-                                        }
-//
-                                    }
-                                    adapterStatus.notifyDataSetChanged();
+        next.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable final QuerySnapshot documentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                assert documentSnapshots != null;
+                if (documentSnapshots.isEmpty()) {
+                    Toast.makeText(getActivity(), "Data masih kosong", Toast.LENGTH_SHORT).show();
+                } else {
 
-                                }
-                            });
+                    lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
+                    for (DocumentChange doc : documentSnapshots.getDocumentChanges()) {
 
+                        if (doc.getType() == DocumentChange.Type.ADDED) {
 
+                            String postId = doc.getDocument().getId();
+
+                            final Status_PostList dataPost = doc.getDocument().toObject(Status_PostList.class).withId(postId);
+
+                            postLists.add(dataPost);
+
+                            adapterStatus.notifyDataSetChanged();
                         }
 
                     }
                 }
-
-                isFirstPageFirstLoad = false;
-
             }
         });
 
-
     }
 
-
-    public void loadMorePost() {
-
-        if (firebaseAuth.getCurrentUser() != null) {
-            Query nextQuery = firebaseFirestore.collection("posting")
-                    .orderBy("postTime", Query.Direction.DESCENDING)
-                    .startAfter(lastVisible).limit(3);
-
-            nextQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
-                @Override
-                public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-
-                    if (!documentSnapshots.isEmpty()) {
-                        lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
-                        for (DocumentChange doc : documentSnapshots.getDocumentChanges()) {
-
-                            if (doc.getType() == DocumentChange.Type.ADDED) {
-
-                                String postId = doc.getDocument().getId();
-                                final Status_PostList dataPost = doc.getDocument().toObject(Status_PostList.class).withId(postId);
-                                String blogUserId = doc.getDocument().getString("user_id");
-                                firebaseFirestore.collection("users").document(blogUserId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-
-                                        if (task.isSuccessful()) {
-
-                                            User user = task.getResult().toObject(User.class);
-
-                                            user_list.add(user);
-                                            postLists.add(dataPost);
-//
-                                        }
-                                        adapterStatus.notifyDataSetChanged();
-
-                                    }
-                                });
-
-
-                            }
-
-                        }
-                    }
-
-                }
-            });
-
-        }
-    }
 
 }

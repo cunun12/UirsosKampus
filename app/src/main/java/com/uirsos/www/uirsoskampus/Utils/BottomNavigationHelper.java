@@ -12,6 +12,7 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.uirsos.www.uirsoskampus.Profile.ProfileActivity;
 import com.uirsos.www.uirsoskampus.R;
 import com.uirsos.www.uirsoskampus.StatusInfo.MainActivity;
+import com.uirsos.www.uirsoskampus.Verifikasi.Verifikasi;
 
 /**
  * Created by cunun12 on 03/05/2018.
@@ -52,7 +53,7 @@ public class BottomNavigationHelper {
 
                         break;
                     case R.id.verifikasiUser:
-                        Intent intentVerifikasi = new Intent(context, ProfileActivity.class); //Activity num 2
+                        Intent intentVerifikasi = new Intent(context, Verifikasi.class); //Activity num 2
                         intentVerifikasi.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         context.startActivity(intentVerifikasi);
 

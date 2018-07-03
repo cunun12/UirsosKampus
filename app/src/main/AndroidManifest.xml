@@ -37,7 +37,9 @@
         <activity android:name=".Profile.FriendActivity" />
         <activity android:name=".Profile.StatusActivity" />
         <activity android:name=".Verifikasi.VerifikasiAccount" />
-        <activity android:name=".StatusInfo.DetailBerita"></activity>
+        <activity android:name=".StatusInfo.DetailBerita" />
+        <activity android:name=".Verifikasi.Verifikasi"></activity>
+        <activity android:name=".Verifikasi.DetailVerifikasi"/>
     </application>
 
 </manifest>

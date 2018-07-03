@@ -233,7 +233,7 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
                                             public void onComplete(@NonNull Task<DocumentReference> task) {
 
                                                 if (task.isSuccessful()) {
-
+                                                    progressBar.setVisibility(View.GONE);
                                                     Intent beritaIntent = new Intent(NewPostActivity.this, MainActivity.class);
                                                     startActivity(beritaIntent);
                                                     finish();
@@ -263,7 +263,7 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
                         Toast.makeText(NewPostActivity.this, "Error tu =" + Error, Toast.LENGTH_SHORT).show();
 
                     }
-                    progressBar.setVisibility(View.GONE);
+
                 }
             });
 

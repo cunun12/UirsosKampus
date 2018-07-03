@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
-        user_id = mAuth.getCurrentUser().getUid();
+        user_id = mAuth.getUid();
 
         defaultBottomNav = (BottomNavigationViewEx) findViewById(R.id.defaultBottom);
         adminBottomNav = (BottomNavigationViewEx) findViewById(R.id.adminNavbar);
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 String level = task.getResult().getString("level");
-                Log.d("MainActivity", "onComplete: adminlevel"+level);
+                Log.d("MainActivity", "onComplete: adminlevel" + level);
                 if (level.equals("admin")) {
                     defaultBottomNav.setVisibility(View.GONE);
                     adminBottomNav.setVisibility(View.VISIBLE);
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                     MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
                     menuItem.setChecked(true);
 
-                } else if (level.equals("pending")){
+                } else {
                     //jika level bukan admin maka menu nya cuman ada menu home dan profile
                     adminBottomNav.setVisibility(View.GONE);
                     defaultBottomNav.setVisibility(View.VISIBLE);

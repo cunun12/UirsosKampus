@@ -82,18 +82,6 @@ public class AdapterHistory extends RecyclerView.Adapter<AdapterHistory.HistoryH
             @Override
             public void onClick(final View v) {
 
-//                firebaseFirestore.collection("posting").whereEqualTo("imagePost", imageUrl)
-//                        .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//
-//                        if (task.isSuccessful()) {
-//
-//                            for (DocumentSnapshot doc : task.getResult()) {
-//
-//                                Log.d(TAG, doc.getId() + "<=ID cobacoy: " + doc.getData());
-//
-//                                final String postId = doc.getId();
 
                 firebaseFirestore.collection("users").document(userid).get()
                         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -118,14 +106,6 @@ public class AdapterHistory extends RecyclerView.Adapter<AdapterHistory.HistoryH
                                 }
                             }
                         });
-//
-//                            }
-//                        }
-//
-//                    }
-//
-//
-//                });
 
             }
         });
