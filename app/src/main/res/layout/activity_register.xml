@@ -75,13 +75,18 @@
                     android:tint="#fff"
                     tools:ignore="ContentDescription" />
 
-                <EditText
-                    android:id="@+id/daftar_Npm"
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/npm_1235xxxxx"
-                    android:inputType="number"
-                    android:maxLength="9" />
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/daftar_Npm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/npm_1235xxxxx"
+                        android:inputType="number"
+                        android:maxLength="9" />
+                </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
 
@@ -101,12 +106,17 @@
                     android:tint="#fff"
                     tools:ignore="ContentDescription" />
 
-                <EditText
-                    android:id="@+id/daftar_Email"
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/email"
-                    android:inputType="textEmailAddress" />
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/daftar_Email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/email"
+                        android:inputType="textEmailAddress" />
+                </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
 
@@ -126,12 +136,21 @@
                     android:tint="#fff"
                     tools:ignore="ContentDescription" />
 
-                <EditText
-                    android:id="@+id/daftar_password"
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/password"
-                    android:inputType="textPassword" />
+                    app:passwordToggleEnabled="true">
+
+                    <EditText
+                        android:id="@+id/daftar_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:hint="@string/password"
+                        android:inputType="textPassword" />
+
+                </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
 
@@ -151,12 +170,21 @@
                     android:tint="#fff"
                     tools:ignore="ContentDescription" />
 
-                <EditText
-                    android:id="@+id/daftar_repassword"
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/confrim_password"
-                    android:inputType="textPassword" />
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/daftar_repassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:hint="@string/confrim_password"
+                        android:inputType="textPassword" />
+
+                </android.support.design.widget.TextInputLayout>
+
 
             </LinearLayout>
 
@@ -176,6 +204,12 @@
             android:layout_marginTop="20dp"
             android:text="@string/regitrasi"
             android:textAllCaps="true" />
+
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            />
 
     </LinearLayout>
 

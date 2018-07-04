@@ -52,6 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
     private AdapterHistory adapterHistory;
 
     //firebase
+    String image;
     private FirebaseAuth mAuth;
     private FirebaseFirestore firebaseFirestore;
     private String user_id;
@@ -144,7 +145,7 @@ public class ProfileActivity extends AppCompatActivity {
                             String nama = task.getResult().getString("nama_user");
                             String gender = task.getResult().getString("jenis_kelamin");
                             String fakultas = task.getResult().getString("fakultas");
-                            String image = task.getResult().getString("imagePic");
+                            image = task.getResult().getString("imagePic");
 
                             textNpm.setText(npm);
                             textNama.setText(nama);
@@ -251,6 +252,7 @@ public class ProfileActivity extends AppCompatActivity {
                 setupActivity.putExtra("nama", textNama.getText());
                 setupActivity.putExtra("gender", textGender.getText());
                 setupActivity.putExtra("fakultas", textFakultas.getText());
+                setupActivity.putExtra("image_profile", image);
                 startActivity(setupActivity);
 
                 return true;

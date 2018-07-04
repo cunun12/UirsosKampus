@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,6 +76,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         public void afterTextChanged(Editable editable) {
         }
     };
+    private ProgressBar progressReg;
     private TextView btnMasuk, infoError;
     private LinearLayout lineNpm, lineEmail, linePassword, lineRepassword;
     //firebase
@@ -91,6 +93,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         firebaseAuth = FirebaseAuth.getInstance();
 
         //widget
+        progressReg = findViewById(R.id.progressBar);
         btnSend = findViewById(R.id.btn_Daftar);
         btnSend.setEnabled(false);
         btnMasuk = findViewById(R.id.txtViewMasuk);
@@ -133,7 +136,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private void checkNPM() {
 
         final String getNpm = inputNpm.getText().toString();
-
+        progressReg.setVisibility(View.VISIBLE);
 //        StringRequest requestCheck = new StringRequest(Request.Method.POST, APIServer.check,
 //                new Response.Listener<String>() {
 //                    @Override
@@ -189,8 +192,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             Toast.makeText(RegisterActivity.this, "NPM dapat digunakan", Toast.LENGTH_SHORT).show();
                             lineNpm.setVisibility(View.GONE);
                             btnSend.setEnabled(false);
+                            progressReg.setVisibility(View.GONE);
                             lanjutRegist();
                         } else {
+                            progressReg.setVisibility(View.GONE);
                             Toast.makeText(RegisterActivity.this, "NPM sudah terdaftar", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -211,6 +216,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onClick(View view) {
 
+                progressReg.setVisibility(View.VISIBLE);
                 final String getNpm = inputNpm.getText().toString();
                 final String getEmail = inputEmail.getText().toString();
                 final String getPassword = inputPassword.getText().toString();
@@ -231,6 +237,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                                                 createEmailPassword(getNpm, getEmail, getPassword);
 
                                             } else {
+
+                                                progressReg.setVisibility(View.GONE);
                                                 inputEmail.requestFocus();
                                                 inputEmail.setError("Maaf email sudah terdaftar");
 
@@ -267,6 +275,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
+                    progressReg.setVisibility(View.GONE);
                     Toast.makeText(RegisterActivity.this, "Berhasil Registrasi", Toast.LENGTH_SHORT).show();
                     Intent setupIntent = new Intent(RegisterActivity.this, SetupActivity.class);
                     setupIntent.putExtra("npm", npm);
@@ -274,7 +283,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     startActivity(setupIntent);
                     finish();
                 } else {
-                    Toast.makeText(RegisterActivity.this, "Gagal registrasi", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "Maaf, password harus berisi 6 karakter", Toast.LENGTH_SHORT).show();
                 }
             }
         });

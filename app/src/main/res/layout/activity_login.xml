@@ -48,15 +48,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:textColor="#fff"
             android:text="Silakan masuk dengan NPM anda yang terdaftar"
-            android:textAppearance="@style/TextAppearance.AppCompat.Tooltip" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Tooltip"
+            android:textColor="#fff" />
         <!--Icon Image -->
 
         <LinearLayout
-            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:orientation="vertical">
 
             <!--NPM-->
@@ -74,13 +74,18 @@
                     android:tint="#fff"
                     tools:ignore="ContentDescription" />
 
-                <EditText
-                    android:id="@+id/login_Npm"
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/npm_1235xxxxx"
-                    android:inputType="number"
-                    android:maxLength="9" />
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/login_Npm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/npm_1235xxxxx"
+                        android:inputType="number"
+                        android:maxLength="9" />
+                </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
 
@@ -99,12 +104,17 @@
                     android:tint="#fff"
                     tools:ignore="ContentDescription" />
 
-                <EditText
-                    android:id="@+id/login_Email"
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/email"
-                    android:inputType="textEmailAddress" />
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/login_Email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/email"
+                        android:inputType="textEmailAddress" />
+                </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
 
@@ -124,13 +134,19 @@
                     android:tint="#fff"
                     tools:ignore="ContentDescription" />
 
-                <EditText
-                    android:id="@+id/login_password"
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/password"
-                    android:inputType="textPassword" />
+                    app:passwordToggleEnabled="true">
 
+                    <EditText
+                        android:id="@+id/login_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/password"
+                        android:inputType="textPassword" />
+
+                </android.support.design.widget.TextInputLayout>
             </LinearLayout>
 
         </LinearLayout>
@@ -146,10 +162,9 @@
 
         <ProgressBar
             android:id="@+id/progressBar"
-            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Inverse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="invisible"/>
+            android:visibility="gone" />
 
     </LinearLayout>
 

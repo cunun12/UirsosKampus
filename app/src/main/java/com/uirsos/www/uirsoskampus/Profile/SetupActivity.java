@@ -14,9 +14,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -86,10 +88,13 @@ public class SetupActivity extends AppCompatActivity {
             "Fakultas Ekonomi"
     };
 
+    private String TAG = "Setup";
     private Spinner spinner;
     private Uri mainImageURI = null;
     private boolean isChanged = false;
     private int requestCode = 1;
+
+    private ProgressBar progressBar;
 
     /*widget firebase*/
     private String user_id;
@@ -98,6 +103,7 @@ public class SetupActivity extends AppCompatActivity {
     private StorageReference storageReference;
 
 
+    @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,6 +116,7 @@ public class SetupActivity extends AppCompatActivity {
         user_id = FirebaseAuth.getInstance().getUid();
 
         //widget
+        progressBar = findViewById(R.id.progressBar);
         btnSimpan = findViewById(R.id.btn_simpan);
         inputNama = findViewById(R.id.namaPengguna);
         setupImage = findViewById(R.id.imageProfil);
@@ -126,6 +133,8 @@ public class SetupActivity extends AppCompatActivity {
         String updateNama = updateData.getStringExtra("nama");
         String updateGender = updateData.getStringExtra("gender");
         String updateFakultas = updateData.getStringExtra("fakultas");
+        String imageUser = updateData.getStringExtra("image_profile");
+        Log.d(TAG, "onCreate: image " + imageUser);
 
         if (update == 1) {
             btnSimpan.setText("Update Data");
@@ -144,32 +153,18 @@ public class SetupActivity extends AppCompatActivity {
                 perempuan.setChecked(true);
             }
 
-            firestore.collection("users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @SuppressLint("CheckResult")
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        if (task.getResult().exists()) {
-                            String image = task.getResult().getString("image");
-
-                            if (image != null) {
-                                mainImageURI = Uri.parse(image);
-                                RequestOptions placeholderrequest = new RequestOptions();
-                                placeholderrequest.placeholder(R.drawable.defaulticon);
-                                Glide.with(getApplicationContext())
-                                        .setDefaultRequestOptions(placeholderrequest)
-                                        .load(image)
-                                        .into(setupImage);
-                            } else {
-                                mainImageURI = null;
-                                setupImage.setImageURI(mainImageURI);
-                            }
-
-                        }
-                    }
-                }
-            });
-
+            if (imageUser != null) {
+                mainImageURI = Uri.parse(imageUser);
+                RequestOptions placeholderrequest = new RequestOptions();
+                placeholderrequest.placeholder(R.drawable.defaulticon);
+                Glide.with(getApplicationContext())
+                        .setDefaultRequestOptions(placeholderrequest)
+                        .load(imageUser)
+                        .into(setupImage);
+            } else {
+                mainImageURI = null;
+                setupImage.setImageURI(mainImageURI);
+            }
 
         }
 
@@ -191,7 +186,7 @@ public class SetupActivity extends AppCompatActivity {
 
         final String nama = inputNama.getText().toString();
         final String jenisKelamin = setKelamin.getText().toString();
-
+        progressBar.setVisibility(View.VISIBLE);
         if (isChanged) {
 
             user_id = mAuth.getCurrentUser().getUid();
@@ -200,6 +195,7 @@ public class SetupActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                     if (task.isSuccessful()) {
+                        progressBar.setVisibility(View.GONE);
                         updateStore(task, nama, jenisKelamin);
                     }
                 }
@@ -230,10 +226,10 @@ public class SetupActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-
                             Intent mainActivity = new Intent(SetupActivity.this, ProfileActivity.class);
                             startActivity(mainActivity);
                             finish();
+                            progressBar.setVisibility(View.GONE);
 
                         }
                     }
