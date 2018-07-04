@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -45,12 +46,12 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
     LinearLayoutManager linearLayoutManager;
     LinearLayout lineKomentar;
     List<DataKomentar> listKomentar;
-    List<User> listUser;
     AdapterKomentar adapterKomentar;
     List<String> strings;
     private String idPost;
     private ImageView sendKomentar;
-    private EditText textKomentar;
+    private EditText textKomentar1;
+    private EditText textKomentar2;
     /*Firebase*/
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
@@ -65,7 +66,8 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
         idPost = getIntent().getStringExtra("idPost");
 
         rvKomentar = findViewById(R.id.list_komentar);
-        textKomentar = findViewById(R.id.messageKomentar);
+        textKomentar1 = findViewById(R.id.messageKomentar1);
+        textKomentar2 = findViewById(R.id.messageKomentar2);
         sendKomentar = findViewById(R.id.send_Komentar);
         sendKomentar.setOnClickListener(this);
 
@@ -78,15 +80,12 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
         /*Set Adapter*/
         listKomentar = new ArrayList<>();
         strings = new ArrayList<>();
-        listUser = new ArrayList<>();
-        adapterKomentar = new AdapterKomentar(listKomentar, listUser);
+        adapterKomentar = new AdapterKomentar(listKomentar);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        linearLayoutManager.setReverseLayout(true);
-        linearLayoutManager.setStackFromEnd(true);
-        linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
         rvKomentar.setLayoutManager(linearLayoutManager);
         rvKomentar.setAdapter(adapterKomentar);
+
 
         komentarView();
 
@@ -106,29 +105,18 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
 
                                 for (DocumentChange doc : documentSnapshots.getDocumentChanges()) {
                                     if (doc.getType() == DocumentChange.Type.ADDED) {
-                                        final DataKomentar komentar = doc.getDocument().toObject(DataKomentar.class);
 
-                                        String komentarUserId = doc.getDocument().getString("user_id");
-                                        Log.d("komentarActivity", "onEvent: " + komentarUserId);
-                                        firebaseFirestore.collection("users").document(komentarUserId).get()
-                                                .addOnCompleteListener(KomentarActivity.this, new OnCompleteListener<DocumentSnapshot>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                        if (task.isSuccessful()) {
+                                        String komentarId = doc.getDocument().getId();
+                                        final DataKomentar komentar = doc.getDocument().toObject(DataKomentar.class).withId(komentarId);
 
-                                                            User user = task.getResult().toObject(User.class);
-
-                                                            Log.d("KomentarActivity", "onComplete: " + user);
-                                                            listUser.add(user);
-                                                            listKomentar.add(komentar);
-                                                            linearLayoutManager.scrollToPosition(listKomentar.size() - 1);
-                                                        }
-                                                        adapterKomentar.notifyDataSetChanged();
-                                                    }
-                                                });
+                                        listKomentar.add(komentar);
 
                                     }
                                 }
+                                // membuat RecyclerView otomatis
+                                // scroll ke bawah setelah nama baru ditambahkan
+                                rvKomentar.scrollToPosition(listKomentar.size()-1);
+                                adapterKomentar.notifyDataSetChanged();
 
 
                             }
@@ -153,34 +141,50 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    /*mengirim komentar user*/
     private void kirimKomentar() {
 
-        String getKomentar = textKomentar.getText().toString();
+        String getKomentar1 = textKomentar1.getText().toString();
+        String getKomentar2 = textKomentar2.getText().toString();
 
-        if (!TextUtils.isEmpty(getKomentar)) {
+        if (!TextUtils.isEmpty(getKomentar1)) {
+            textKomentar1.setVisibility(View.GONE);
+            textKomentar2.setVisibility(View.VISIBLE);
 
-            HashMap<String, Object> komentar = new HashMap<>();
-            komentar.put("user_id", user_id);
-            komentar.put("komentar", getKomentar);
-            komentar.put("komentarTime", getTimestamp());
+            HashMap<String, Object> komentar1 = new HashMap<>();
+            komentar1.put("user_id", user_id);
+            komentar1.put("komentar", getKomentar1);
+            komentar1.put("komentarTime", getTimestamp());
 
-            firebaseFirestore.collection("posting/" + idPost + "/komentar").add(komentar)
+            firebaseFirestore.collection("posting/" + idPost + "/komentar")
+                    .add(komentar1)
                     .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentReference> task) {
-                            if (task.isSuccessful()) {
-
-                                textKomentar.setText("");
-                                textKomentar.requestFocus();
-                                linearLayoutManager.scrollToPosition(listKomentar.size() - 1);
-                            } else {
-                                String Error = task.getException().getMessage();
-                                Log.d("KomentarActivity", "onComplete: " + Error);
-                            }
                         }
                     });
+            textKomentar1.setText("");
+            textKomentar2.requestFocus();
+        } else if (!TextUtils.isEmpty(getKomentar2)) {
+            textKomentar1.setVisibility(View.VISIBLE);
+            textKomentar2.setVisibility(View.GONE);
 
+            HashMap<String, Object> komentar2 = new HashMap<>();
+            komentar2.put("user_id", user_id);
+            komentar2.put("komentar", getKomentar2);
+            komentar2.put("komentarTime", getTimestamp());
+
+            firebaseFirestore.collection("posting/" + idPost + "/komentar")
+                    .add(komentar2)
+                    .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentReference> task) {
+                        }
+                    });
+            textKomentar2.setText("");
+            textKomentar1.requestFocus();
         }
+
     }
 
     private String getTimestamp() {

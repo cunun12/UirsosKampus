@@ -1,5 +1,6 @@
 package com.uirsos.www.uirsoskampus.Adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +12,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.uirsos.www.uirsoskampus.POJO.DataKomentar;
 import com.uirsos.www.uirsoskampus.POJO.User;
@@ -32,18 +35,15 @@ import static android.content.ContentValues.TAG;
  * Created by cunun12 on 05/05/2018.
  */
 
-public class AdapterKomentar extends RecyclerView.Adapter<AdapterKomentar.ViewKomentar>{
+public class AdapterKomentar extends RecyclerView.Adapter<AdapterKomentar.ViewKomentar> {
 
-    private List<DataKomentar> listKomentar;
-    private List<User> listUser;
     Context context;
-
+    private List<DataKomentar> listKomentar;
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
 
-    public AdapterKomentar(List<DataKomentar> listKomentar, List<User> listUser) {
+    public AdapterKomentar(List<DataKomentar> listKomentar) {
         this.listKomentar = listKomentar;
-        this.listUser = listUser;
     }
 
     @NonNull
@@ -57,14 +57,28 @@ public class AdapterKomentar extends RecyclerView.Adapter<AdapterKomentar.ViewKo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewKomentar holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewKomentar holder, final int position) {
 
         String getKomentar = listKomentar.get(position).getKomentar();
         holder.setKomentar(getKomentar);
 
-        String username = listUser.get(position).getNama_user();
-        String image = listUser.get(position).getImagePic();
-        holder.setUser(username, image);
+        String komentarUserId = listKomentar.get(position).getUser_id();
+        Log.d(TAG, "onBindViewHolder: komentar" + komentarUserId);
+
+        firebaseFirestore.collection("users").document(komentarUserId)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                        User user = documentSnapshot.toObject(User.class);
+                        assert user != null;
+                        String username = user.getNama_user();
+                        String image = user.getImagePic();
+                        holder.setUser(username, image);
+                    }
+                });
+
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
@@ -87,10 +101,10 @@ public class AdapterKomentar extends RecyclerView.Adapter<AdapterKomentar.ViewKo
             e.printStackTrace();
         }
 
-        if (detik<1) {
+        if (detik < 1) {
             Log.d(TAG, "onBindViewHolder: detik" + detik);
             holder.setTime("Baru");
-        } else if (detik < 60 && detik>0) {
+        } else if (detik < 60 && detik > 0) {
             Log.d(TAG, "onBindViewHolder: detik" + detik);
             String postDetik = String.valueOf(detik);
             holder.setTime(postDetik + " Detik yang Lalu");
@@ -129,10 +143,11 @@ public class AdapterKomentar extends RecyclerView.Adapter<AdapterKomentar.ViewKo
 
         }
 
-        public void setUser(String username, String image){
+        @SuppressLint("CheckResult")
+        public void setUser(String username, String image) {
 
             textUsername = mView.findViewById(R.id.nama_User);
-            komentarPic  = mView.findViewById(R.id.image_pic);
+            komentarPic = mView.findViewById(R.id.image_pic);
             textUsername.setText(username);
 
             RequestOptions placeholderrequest = new RequestOptions();
@@ -144,12 +159,12 @@ public class AdapterKomentar extends RecyclerView.Adapter<AdapterKomentar.ViewKo
 
         }
 
-        public void setTime(String waktu){
+        public void setTime(String waktu) {
             textWaktu = mView.findViewById(R.id.time_Komentar);
             textWaktu.setText(waktu);
         }
 
-        public void setKomentar(String komentar){
+        public void setKomentar(String komentar) {
             textKomentar = mView.findViewById(R.id.komentar_User);
             textKomentar.setText(komentar);
         }

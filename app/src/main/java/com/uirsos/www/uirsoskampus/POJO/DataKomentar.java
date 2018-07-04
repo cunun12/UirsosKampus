@@ -7,7 +7,7 @@ import java.util.Date;
  * Created by cunun12 on 05/05/2018.
  */
 
-public class DataKomentar {
+public class DataKomentar extends PostId{
 
     private String user_id, komentar;
     private String komentarTime;

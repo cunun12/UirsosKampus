@@ -40,12 +40,10 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list_komentar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_above="@+id/relatif"
-        android:layout_marginTop="60dp"
-        android:clipChildren="true"
+        android:layout_below="@+id/barlayout"
         android:clipToPadding="true"
-        app:reverseLayout="true"
         app:stackFromEnd="true" />
 
     <RelativeLayout
@@ -64,13 +62,23 @@
             android:weightSum="6">
 
             <EditText
-                android:id="@+id/messageKomentar"
+                android:id="@+id/messageKomentar1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
                 android:backgroundTint="@color/likeBtnAccent"
                 android:hint="@string/komentar"
                 tools:ignore="UnusedAttribute" />
+
+            <EditText
+                android:id="@+id/messageKomentar2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:backgroundTint="@color/likeBtnAccent"
+                android:hint="@string/komentar"
+                tools:ignore="UnusedAttribute"
+                android:visibility="gone"/>
 
             <ImageView
                 android:id="@+id/send_Komentar"
