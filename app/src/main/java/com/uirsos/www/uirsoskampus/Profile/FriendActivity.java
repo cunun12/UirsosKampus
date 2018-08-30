@@ -109,7 +109,7 @@ public class FriendActivity extends AppCompatActivity {
                             for (DocumentSnapshot document : task.getResult()) {
                                 Log.d("Profile", document.getId() + " pajako => " + document.getData());
 
-                                Status_PostList dataitem = new Status_PostList();
+                                Status_PostList dataitem = new Status_PostList().withId(document.getId());
                                 dataitem.setUser_id(document.getString("user_id"));
                                 dataitem.setImagePost(document.getString("imagePost"));
                                 dataitem.setDeskripsi(document.getString("deskripsi"));

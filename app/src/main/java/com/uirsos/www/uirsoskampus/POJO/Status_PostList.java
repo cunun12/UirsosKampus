@@ -9,17 +9,18 @@ import java.util.Date;
 public class Status_PostList extends PostId{
 
     private String user_id, deskripsi, image_thumb, imagePost;
-    private String postTime;
+    private String postTime, fakultas;
 
     public Status_PostList() {
     }
 
-    public Status_PostList(String user_id, String deskripsi, String image_thumb, String imagePost, String postTime) {
+    public Status_PostList(String user_id, String deskripsi, String image_thumb, String imagePost, String postTime, String fakultas) {
         this.user_id = user_id;
         this.deskripsi = deskripsi;
         this.image_thumb = image_thumb;
         this.imagePost = imagePost;
         this.postTime = postTime;
+        this.fakultas = fakultas;
     }
 
     public String getUser_id() {
@@ -60,5 +61,13 @@ public class Status_PostList extends PostId{
 
     public void setPostTime(String postTime) {
         this.postTime = postTime;
+    }
+
+    public String getFakultas() {
+        return fakultas;
+    }
+
+    public void setFakultas(String fakultas) {
+        this.fakultas = fakultas;
     }
 }

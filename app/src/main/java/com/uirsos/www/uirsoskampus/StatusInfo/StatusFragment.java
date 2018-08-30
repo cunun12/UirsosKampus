@@ -1,5 +1,6 @@
 package com.uirsos.www.uirsoskampus.StatusInfo;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +27,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.uirsos.www.uirsoskampus.Adapter.AdapterStatus;
 import com.uirsos.www.uirsoskampus.POJO.Status_PostList;
@@ -33,6 +37,7 @@ import com.uirsos.www.uirsoskampus.SignUp.RegisterActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static android.content.ContentValues.TAG;
 
@@ -49,6 +54,8 @@ public class StatusFragment extends Fragment {
     /*widget Firebase*/
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
+    private String users_id;
+    private String fakultas_users;
 
     private DocumentSnapshot lastVisible;
     private Boolean isFirstPageFirstLoad = true; // untuk membuka halaman pertama diambil
@@ -75,6 +82,7 @@ public class StatusFragment extends Fragment {
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
+        users_id = firebaseAuth.getCurrentUser().getUid();
 
         btnAddPost.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,12 +99,34 @@ public class StatusFragment extends Fragment {
 
         if (firebaseAuth.getCurrentUser() != null) {
 
-            dataView();
+            firebaseFirestore.collection("users").document(users_id)
+                    .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                        @Override
+                        public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+
+                            if (e != null) {
+                                Log.w(TAG, "Listen failed.", e);
+                                return;
+                            }
+
+                            if (documentSnapshot != null && documentSnapshot.exists()) {
+
+                                fakultas_users = documentSnapshot.getString("fakultas");
+                                Log.d(TAG, "ko fakultas : " + fakultas_users);
+                                dataView();
+
+                            } else {
+                                Log.d(TAG, "onEvent: Data Null");
+                            }
+
+                        }
+                    });
 
         }
 
     }
 
+    @SuppressLint("NewApi")
     private void dataView() {
 
         listStatus.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -110,40 +140,73 @@ public class StatusFragment extends Fragment {
                     if (firebaseAuth.getCurrentUser() != null) {
 
                         loadMorePost();
+
                     }
 
                 }
             }
         });
 
-        Query firstQuery = firebaseFirestore.collection("posting")
-                .orderBy("postTime", Query.Direction.DESCENDING).limit(3);
-        firstQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
+        Query firstPost = firebaseFirestore.collection("posting")
+                .orderBy("postTime", Query.Direction.DESCENDING);
+        firstPost.addSnapshotListener(Objects.requireNonNull(getActivity()), new EventListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@javax.annotation.Nullable final QuerySnapshot documentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                assert documentSnapshots != null;
-                if (documentSnapshots.isEmpty()) {
-                    Toast.makeText(getActivity(), "Data masih kosong", Toast.LENGTH_SHORT).show();
+            public void onEvent(@javax.annotation.Nullable QuerySnapshot orderTime, @javax.annotation.Nullable FirebaseFirestoreException e) {
+
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+
+                if (orderTime.isEmpty()) {
+
+                    Toast.makeText(getActivity(), "titik", Toast.LENGTH_SHORT).show();
+
                 } else {
-                    lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
-                    for (DocumentChange doc : documentSnapshots.getDocumentChanges()) {
+                    lastVisible = orderTime.getDocuments().get(orderTime.size() - 1);
 
-                        if (doc.getType() == DocumentChange.Type.ADDED) {
+                    for (DocumentChange doc : orderTime.getDocumentChanges()) {
 
-                            String postId = doc.getDocument().getId();
+                        switch (doc.getType()) {
 
-                            final Status_PostList dataPost = doc.getDocument().toObject(Status_PostList.class).withId(postId);
+                            case ADDED:
 
-                            if (isFirstPageFirstLoad) {
-                                postLists.add(dataPost);
-                            } else {
-                                postLists.add(0, dataPost);
-                            }
+                                String fakultas = doc.getDocument().getString("fakultas");
+
+                                if (fakultas != null) {
+
+                                    if (fakultas.equals(fakultas_users)) {
+
+                                        Log.d(TAG, "cubo: " + doc.getDocument().getData());
+                                        String postId = doc.getDocument().getId();
+
+                                        Status_PostList post = doc.getDocument().toObject(Status_PostList.class).withId(postId);
+
+                                        if (isFirstPageFirstLoad) {
+                                            postLists.add(post);
+                                        } else {
+                                            postLists.add(0, post);
+                                        }
+
+                                    }
+
+                                }
+
+                                break;
+                            case MODIFIED:
+                                Log.d(TAG, "Modified city: " + doc.getDocument().getData());
+                                break;
+                            case REMOVED:
+                                Log.d(TAG, "Removed city: " + doc.getDocument().getData());
+                                break;
+
                         }
 
                     }
+
                     adapterStatus.notifyDataSetChanged();
                 }
+
             }
         });
     }
@@ -155,30 +218,52 @@ public class StatusFragment extends Fragment {
                 .startAfter(lastVisible)
                 .limit(3);
 
-        next.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
+        next.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@javax.annotation.Nullable final QuerySnapshot documentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                assert documentSnapshots != null;
-                if (documentSnapshots.isEmpty()) {
-                    Toast.makeText(getActivity(), "Data masih kosong", Toast.LENGTH_SHORT).show();
-                } else {
+            public void onEvent(@javax.annotation.Nullable QuerySnapshot orderTime, @javax.annotation.Nullable FirebaseFirestoreException e) {
 
-                    lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
-                    for (DocumentChange doc : documentSnapshots.getDocumentChanges()) {
+                if (!orderTime.isEmpty()) {
 
-                        if (doc.getType() == DocumentChange.Type.ADDED) {
+                    lastVisible = orderTime.getDocuments().get(orderTime.size() - 1);
 
-                            String postId = doc.getDocument().getId();
+                    for (DocumentChange doc : orderTime.getDocumentChanges()) {
 
-                            final Status_PostList dataPost = doc.getDocument().toObject(Status_PostList.class).withId(postId);
+                        switch (doc.getType()) {
 
-                            postLists.add(dataPost);
+                            case ADDED:
 
-                            adapterStatus.notifyDataSetChanged();
+                                String fakultas = doc.getDocument().getString("fakultas");
+
+                                if (fakultas != null) {
+
+                                    if (fakultas.equals(fakultas_users)) {
+
+                                        Log.d(TAG, "cubo: " + doc.getDocument().getData());
+                                        String postId = doc.getDocument().getId();
+
+                                        Status_PostList post = doc.getDocument().toObject(Status_PostList.class).withId(postId);
+
+                                        postLists.add(post);
+
+                                        adapterStatus.notifyDataSetChanged();
+                                    }
+
+                                }
+
+                                break;
+                            case MODIFIED:
+                                Log.d(TAG, "Modified city: " + doc.getDocument().getData());
+                                break;
+                            case REMOVED:
+                                Log.d(TAG, "Removed city: " + doc.getDocument().getData());
+                                break;
+
                         }
 
                     }
+
                 }
+
             }
         });
 

@@ -1,5 +1,6 @@
 package com.uirsos.www.uirsoskampus.Profile;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -21,10 +22,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.uirsos.www.uirsoskampus.Adapter.AdapterHistory;
+import com.uirsos.www.uirsoskampus.POJO.PostId;
 import com.uirsos.www.uirsoskampus.POJO.Status_PostList;
 import com.uirsos.www.uirsoskampus.R;
 import com.uirsos.www.uirsoskampus.SignUp.LoginActivity;
@@ -35,6 +39,8 @@ import com.uirsos.www.uirsoskampus.Utils.GridImageDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -56,6 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore firebaseFirestore;
     private String user_id;
+    private String TAG= "profileActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +116,14 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void loadHistory() {
 
+        firebaseFirestore.collection("posting").whereEqualTo("user_id", user_id)
+                .addSnapshotListener(ProfileActivity.this, new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+
+            }
+        });
+
         firebaseFirestore.collection("posting")
                 .whereEqualTo("user_id", user_id)
                 .get()
@@ -119,7 +134,7 @@ public class ProfileActivity extends AppCompatActivity {
                             for (DocumentSnapshot document : task.getResult()) {
                                 Log.d("Profile", document.getId() + " pajako => " + document.getData());
 
-                                Status_PostList dataitem = new Status_PostList();
+                                Status_PostList dataitem = new Status_PostList().withId(document.getId());
                                 dataitem.setUser_id(document.getString("user_id"));
                                 dataitem.setImagePost(document.getString("imagePost"));
                                 dataitem.setDeskripsi(document.getString("deskripsi"));
@@ -137,6 +152,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         firebaseFirestore.collection("users").document(user_id).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @SuppressLint("CheckResult")
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
@@ -178,29 +194,42 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
 
-        firebaseFirestore.collection("users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        firebaseFirestore.collection("users").document(user_id).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                String level = task.getResult().getString("level");
-                if (level.equals("admin")) {
-                    defaultBottomNav.setVisibility(View.GONE);
-                    adminBottomNav.setVisibility(View.VISIBLE);
-                    BottomNavigationHelper.setupBottomNavigationView(adminBottomNav);
-                    BottomNavigationHelper.enableNavigation(ProfileActivity.this, adminBottomNav);
-                    Menu menu = adminBottomNav.getMenu();
-                    MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
-                    menuItem.setChecked(true);
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    Log.d(TAG, "Current data: " + documentSnapshot.getData());
+
+                    String level = documentSnapshot.getString("level");
+                    if (level.equals("admin")){
+                        defaultBottomNav.setVisibility(View.GONE);
+                        adminBottomNav.setVisibility(View.VISIBLE);
+                        BottomNavigationHelper.setupBottomNavigationView(adminBottomNav);
+                        BottomNavigationHelper.enableNavigation(ProfileActivity.this, adminBottomNav);
+                        Menu menu = adminBottomNav.getMenu();
+                        MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
+                        menuItem.setChecked(true);
+                    } else{
+                        //jika level bukan admin maka menu nya cuman ada menu home dan profile
+                        adminBottomNav.setVisibility(View.GONE);
+                        defaultBottomNav.setVisibility(View.VISIBLE);
+                        BottomNavigationHelper.setupBottomNavigationView(defaultBottomNav);
+                        BottomNavigationHelper.enableNavigation(ProfileActivity.this, defaultBottomNav);
+                        Menu menu = defaultBottomNav.getMenu();
+                        MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
+                        menuItem.setChecked(true);
+                    }
 
                 } else {
-                    adminBottomNav.setVisibility(View.GONE);
-                    defaultBottomNav.setVisibility(View.VISIBLE);
-                    //jika level bukan admin maka menu nya cuman ada menu home dan profile
-                    BottomNavigationHelper.setupBottomNavigationView(defaultBottomNav);
-                    BottomNavigationHelper.enableNavigation(ProfileActivity.this, defaultBottomNav);
-                    Menu menu = defaultBottomNav.getMenu();
-                    MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
-                    menuItem.setChecked(true);
+                    Log.d(TAG, "Current data: null");
                 }
+
             }
         });
 

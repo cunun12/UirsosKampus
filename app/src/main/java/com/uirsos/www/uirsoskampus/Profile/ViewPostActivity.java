@@ -97,7 +97,7 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
         postId = post.getStringExtra("postId");
         userId = post.getStringExtra("userId");
 
-        Log.d(TAG, "onCreate: userId " +userId);
+        Log.d(TAG, "onCreate: userId " +postId);
 
         Log.d(TAG, "onCreate: currendUserID " +currentUserId);
 

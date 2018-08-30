@@ -53,7 +53,6 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
 
     private static final String LOG_TAG = "Adapterstatus";
     public List<Status_PostList> postLists;
-    public List<User> userList;
     Context context;
 
     private FirebaseFirestore firebaseFirestore;
@@ -92,21 +91,32 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
         final String user_id = postLists.get(position).getUser_id();
 
         assert currentUserId != null;
-        firebaseFirestore.collection("users").document(user_id).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+
+        /*untuk mengambil profile dan nama*/
+        firebaseFirestore.collection("users").document(user_id)
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @SuppressLint("CheckResult")
                     @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
 
-                        User user= task.getResult().toObject(User.class);
+                        if (e != null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
+                        }
 
-                        assert user != null;
-                        String userName = user.getNama_user();
-                        String userImage = user.getImagePic();
-                        holder.setUserData(userName, userImage);
+                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                            User user = documentSnapshot.toObject(User.class);
+
+                            assert user != null;
+                            String userName = user.getNama_user();
+                            String userImage = user.getImagePic();
+                            holder.setUserData(userName, userImage);
+                        } else {
+                            Log.d(TAG, "onEvent: Data Null");
+                        }
 
                     }
                 });
-
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));

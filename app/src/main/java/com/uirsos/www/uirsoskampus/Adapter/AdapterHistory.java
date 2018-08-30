@@ -44,11 +44,11 @@ import static android.content.ContentValues.TAG;
 public class AdapterHistory extends RecyclerView.Adapter<AdapterHistory.HistoryHolder> {
 
     private static final String LOG_TAG = "AdapterHistory";
-    public List<Status_PostList> listHistory;
-    public Context mContext;
+    private List<Status_PostList> listHistory;
+    private Context mContext;
 
 
-    FirebaseFirestore firebaseFirestore;
+    private FirebaseFirestore firebaseFirestore;
 
     private FirebaseAuth firebaseAuth;
 
@@ -56,8 +56,9 @@ public class AdapterHistory extends RecyclerView.Adapter<AdapterHistory.HistoryH
         this.listHistory = listHistory;
     }
 
+    @NonNull
     @Override
-    public HistoryHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public HistoryHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_imageview, parent, false);
         mContext = parent.getContext();
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -66,9 +67,12 @@ public class AdapterHistory extends RecyclerView.Adapter<AdapterHistory.HistoryH
     }
 
     @Override
-    public void onBindViewHolder(final HistoryHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final HistoryHolder holder, final int position) {
+
+        holder.setIsRecyclable(false);
 
         final String postId = listHistory.get(position).PostId;
+        Log.d(TAG, "onBindViewHolder: postid" +postId);
 
         final String imageUrl = listHistory.get(position).getImagePost();
         final String desc = listHistory.get(position).getDeskripsi();

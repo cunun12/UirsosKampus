@@ -137,6 +137,24 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         final String getNpm = inputNpm.getText().toString();
         progressReg.setVisibility(View.VISIBLE);
+
+        firebaseFirestore.collection("users").whereEqualTo("npm", getNpm).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.getResult().isEmpty()) {
+                            Toast.makeText(RegisterActivity.this, "NPM dapat digunakan", Toast.LENGTH_SHORT).show();
+                            lineNpm.setVisibility(View.GONE);
+                            btnSend.setEnabled(false);
+                            progressReg.setVisibility(View.GONE);
+                            lanjutRegist();
+                        } else {
+                            progressReg.setVisibility(View.GONE);
+                            Toast.makeText(RegisterActivity.this, "NPM sudah terdaftar", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
 //        StringRequest requestCheck = new StringRequest(Request.Method.POST, APIServer.check,
 //                new Response.Listener<String>() {
 //                    @Override
@@ -183,23 +201,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //
 //        RequestHandler.getInstance(RegisterActivity.this).addToRequestQueue(requestCheck);
 //
-
-        firebaseFirestore.collection("users").whereEqualTo("npm", getNpm).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.getResult().isEmpty()) {
-                            Toast.makeText(RegisterActivity.this, "NPM dapat digunakan", Toast.LENGTH_SHORT).show();
-                            lineNpm.setVisibility(View.GONE);
-                            btnSend.setEnabled(false);
-                            progressReg.setVisibility(View.GONE);
-                            lanjutRegist();
-                        } else {
-                            progressReg.setVisibility(View.GONE);
-                            Toast.makeText(RegisterActivity.this, "NPM sudah terdaftar", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
 
     }
 
@@ -260,8 +261,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                 } else {
 
-                    infoError.setVisibility(View.VISIBLE);
-                    infoError.setText("Masukan semua data");
+
+                    Toast.makeText(RegisterActivity.this, "Masukan semua data yang diperlukan", Toast.LENGTH_SHORT).show();
+                    progressReg.setVisibility(View.GONE);
+//                    infoError.setVisibility(View.VISIBLE);
+//                    infoError.setText("Masukan semua data");
 
                 }
 

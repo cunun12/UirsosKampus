@@ -1,5 +1,6 @@
 package com.uirsos.www.uirsoskampus.StatusInfo;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,8 +28,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -50,6 +54,8 @@ import java.util.UUID;
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
 
+import static android.content.ContentValues.TAG;
+
 public class NewPostActivity extends AppCompatActivity implements View.OnClickListener {
 
     TextWatcher textWatcher = new TextWatcher() {
@@ -64,7 +70,7 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
 
             if (!getKet.isEmpty()) {
                 btnSimpan.setEnabled(true);
-            }else{
+            } else {
                 btnSimpan.setEnabled(false);
             }
         }
@@ -78,6 +84,7 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
     private String user_id;
+    private String fakultas;
     private StorageReference storageReference;
 
     /*Widget layout*/
@@ -114,16 +121,22 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
         user_id = mAuth.getCurrentUser().getUid();
 
         /*untuk mengambil profile dan nama*/
-        firestore.collection("users") //nama table
-                .document(user_id).get() // menampilkan berdasarkan id user
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        firestore.collection("users").document(user_id)
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @SuppressLint("CheckResult")
                     @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.getResult().exists()) {
-                            String image = task.getResult().getString("imagePic");
-                            String nama = task.getResult().getString("nama_user");
+                    public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
 
-                            namaUser.setText(nama);
+                        if (e != null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
+                        }
+
+                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                            String image = documentSnapshot.getString("imagePic");
+//                          Log.d(TAG, "Ko data user: " + documentSnapshot.getData());
+                            fakultas = documentSnapshot.getString("fakultas");
+                            namaUser.setText(documentSnapshot.getString("nama_user"));
 
                             RequestOptions placeholderrequest = new RequestOptions();
                             placeholderrequest.placeholder(R.drawable.defaulticon);
@@ -131,7 +144,12 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
                                     .setDefaultRequestOptions(placeholderrequest)
                                     .load(image)
                                     .into(imageProfile);
+
+                            Log.d(TAG, "ko fakultas : " + fakultas);
+                        } else {
+                            Log.d(TAG, "onEvent: Data Null");
                         }
+
                     }
                 });
 
@@ -225,6 +243,7 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
                                 postMap.put("image_thumb", downloadThumbUri);
                                 postMap.put("deskripsi", textKet);
                                 postMap.put("user_id", user_id);
+                                postMap.put("fakultas", fakultas);
                                 postMap.put("postTime", getTimestamp());
 
                                 firestore.collection("posting").add(postMap)
