@@ -68,6 +68,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
+    private String current_user_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,56 +183,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             }
                         }
                     });
-
-//            firebaseFirestore.collection("Users")
-//                    .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                @Override
-//                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//
-//                    for (QueryDocumentSnapshot doc : task.getResult()) {
-//
-//                        String npm = doc.getString("npm");
-//                        final String email = doc.getString("email");
-//
-//                        if (npm.equals(getNpm) == email.equals(getEmail)) {
-//
-//                            btnSend.setEnabled(false);
-//                            lineNpm.setVisibility(View.GONE);
-//                            lineEmail.setVisibility(View.GONE);
-//                            linePassword.setVisibility(View.VISIBLE);
-//                            btnSend.setEnabled(true);
-//                            btnSend.setText("Login");
-//                            btnSend.setOnClickListener(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View view) {
-//
-//                                    String email = inputEmail.getText().toString().trim();
-//                                    String getPassword = inputPassword.getText().toString();
-//
-//                                    firebaseAuth.signInWithEmailAndPassword(email, getPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//                                        @Override
-//                                        public void onComplete(@NonNull Task<AuthResult> task) {
-//                                            Intent intentProfile = new Intent(LoginActivity.this, MainActivity.class);
-//                                            startActivity(intentProfile);
-//                                            finish();
-//                                        }
-//                                    });
-//                                }
-//                            });
-//
-//                        } else {
-//                            btnSend.setEnabled(true);
-//                            loginProgres.setVisibility(View.GONE);
-//                            Toast.makeText(LoginActivity.this, "Data tidak ditemukan", Toast.LENGTH_SHORT).show();
-//                        }
-//
-//                        loginProgres.setVisibility(View.GONE);
-//
-//                    }
-//
-//                }
-//            });
-
         } else {
             btnSend.setEnabled(true);
             loginProgres.setVisibility(View.GONE);
@@ -250,6 +201,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (currentUser != null) {
 
             sendToMain();
+
+        } else {
+
+            Log.d(TAG, "onStart: LoginActivity.class");
 
         }
     }

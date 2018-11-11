@@ -90,104 +90,6 @@
 
             </LinearLayout>
 
-            <!--Email-->
-            <LinearLayout
-                android:id="@+id/line_Email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="35dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/ic_email"
-                    android:tint="#fff"
-                    tools:ignore="ContentDescription" />
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:id="@+id/daftar_Email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/email"
-                        android:inputType="textEmailAddress" />
-                </android.support.design.widget.TextInputLayout>
-
-            </LinearLayout>
-
-            <!--Password-->
-            <LinearLayout
-                android:id="@+id/line_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="35dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/ic_lock_open"
-                    android:tint="#fff"
-                    tools:ignore="ContentDescription" />
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:passwordToggleEnabled="true">
-
-                    <EditText
-                        android:id="@+id/daftar_password"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:hint="@string/password"
-                        android:inputType="textPassword" />
-
-                </android.support.design.widget.TextInputLayout>
-
-            </LinearLayout>
-
-            <!--Re-Password-->
-            <LinearLayout
-                android:id="@+id/line_Re-password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="35dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/ic_lock"
-                    android:tint="#fff"
-                    tools:ignore="ContentDescription" />
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:id="@+id/daftar_repassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:hint="@string/confrim_password"
-                        android:inputType="textPassword" />
-
-                </android.support.design.widget.TextInputLayout>
-
-
-            </LinearLayout>
-
             <TextView
                 android:id="@+id/info_Error"
                 android:layout_width="match_parent"
@@ -202,7 +104,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="@string/regitrasi"
+            android:text="@string/check"
             android:textAllCaps="true" />
 
         <ProgressBar

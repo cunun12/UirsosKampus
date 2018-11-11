@@ -2,19 +2,25 @@ package com.uirsos.www.uirsoskampus.Profile;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,6 +35,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -42,9 +49,11 @@ import android.widget.Spinner;
 
 import android.widget.TextView;
 
+import com.rey.material.widget.SnackBar;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.uirsos.www.uirsoskampus.R;
+import com.uirsos.www.uirsoskampus.SignUp.RegisterActivity;
 import com.uirsos.www.uirsoskampus.StatusInfo.MainActivity;
 
 import java.util.HashMap;
@@ -54,26 +63,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SetupActivity extends AppCompatActivity {
 
-    TextWatcher npmEmailTextWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-//            btnSend.setEnabled(!getNpm.isEmpty() && !getEmail.isEmpty());
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-        }
-    };
     //widget
     private Button btnSimpan;
     private RadioGroup radioGroup;
-    private EditText inputNama;
+    private EditText inputNama, inputEmail, inputPassword, inputRePassword;
     private CircleImageView setupImage;
     private TextView setKelamin, kategoriFakultas;
     private String[] kategori = {
@@ -98,10 +91,13 @@ public class SetupActivity extends AppCompatActivity {
 
     /*widget firebase*/
     private String user_id;
+    String user;
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
     private StorageReference storageReference;
 
+    /*get Intent dari RegisterActivity*/
+    String regNpm;
 
     @SuppressLint("CheckResult")
     @Override
@@ -119,6 +115,9 @@ public class SetupActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         btnSimpan = findViewById(R.id.btn_simpan);
         inputNama = findViewById(R.id.namaPengguna);
+        inputEmail = findViewById(R.id.daftar_Email);
+        inputPassword = findViewById(R.id.daftar_password);
+        inputRePassword = findViewById(R.id.daftar_repassword);
         setupImage = findViewById(R.id.imageProfil);
         setKelamin = findViewById(R.id.gender);
         setKelamin.setText(R.string.laki_laki);
@@ -128,6 +127,12 @@ public class SetupActivity extends AppCompatActivity {
         setSpinner();
         setImage();
 
+        /*Bagian getIntent tambah users*/
+        Intent addNpm = getIntent();
+        regNpm = addNpm.getStringExtra("npm");
+
+
+        /*bagian getIntent update users*/
         final Intent updateData = getIntent();
         final int update = updateData.getIntExtra("update", 0);
         String updateNama = updateData.getStringExtra("nama");
@@ -182,6 +187,26 @@ public class SetupActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are You Sure Want to Exit?")
+                .setCancelable(false)//tidak bisa tekan tombol back
+                //jika pilih yess
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                    }
+                })
+                //jika pilih no
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                }).show();
+
+    }
+
     private void UpdateData() {
 
         final String nama = inputNama.getText().toString();
@@ -226,8 +251,9 @@ public class SetupActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Intent mainActivity = new Intent(SetupActivity.this, ProfileActivity.class);
-                            startActivity(mainActivity);
+                            Intent profilActivity = new Intent(SetupActivity.this, ProfileActivity.class);
+                            profilActivity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(profilActivity);
                             finish();
                             progressBar.setVisibility(View.GONE);
 
@@ -237,30 +263,80 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     /*Proses menambahkan data users*/
+    private void createEmailPassword(final String namaUser, final String email, String password, final String fakultas, final String jenisKelamin) {
+        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "createUserWithEmailPassword: success");
+                    user = mAuth.getCurrentUser().getUid();
+
+                    StorageReference imageUrl = storageReference.child("profile_image").child(user + ".jpg");
+                    imageUrl.putFile(mainImageURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                addStoreFirebase(task, regNpm, email, namaUser, jenisKelamin, fakultas);
+                            }
+                        }
+                    });
+
+//                    Map<String, String> datauser = new HashMap<>();
+//                    datauser.put("npm", regNpm);
+//                    datauser.put("email", email);
+//                    firestore.collection("users").document(user).set(datauser).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<Void> task) {
+//                            Toast.makeText(SetupActivity.this, "Tersimpan", Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                    Toast.makeText(SetupActivity.this, "Email Sudah terdaftar",
+                            Toast.LENGTH_SHORT).show();
+//                    updateUI(null);
+                }
+            }
+        });
+    }
+
     private void TambahData() {
 
-        /*get Intent dari RegisterActivity*/
-        Intent registData = getIntent();
-        final String npm = registData.getStringExtra("npm");
-        final String email = registData.getStringExtra("email");
-        final String password = registData.getStringExtra("password");
         /*data dari SetupActivity*/
+        final String email = inputEmail.getText().toString();
+        final String password = inputPassword.getText().toString();
+        String rePassword = inputRePassword.getText().toString();
         final String namaUser = inputNama.getText().toString();
-        final String jenisKelamin = setKelamin.getText().toString();
-        final String fakultas = kategoriFakultas.getText().toString();
+        String jenisKelamin = setKelamin.getText().toString();
+        String fakultas = kategoriFakultas.getText().toString();
 
-        if (!TextUtils.isEmpty(namaUser) && mainImageURI != null) {
-            user_id = mAuth.getCurrentUser().getUid();
+        if (mainImageURI != null) {
+            if (!namaUser.isEmpty() && !email.isEmpty() && !password.isEmpty() && !rePassword.isEmpty()) {
+                if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
 
-            StorageReference imageUrl = storageReference.child("profile_image").child(user_id + ".jpg");
-            imageUrl.putFile(mainImageURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        addStoreFirebase(task, npm, email, namaUser, jenisKelamin, fakultas);
+                    if (password.equals(rePassword)) {
+
+                        createEmailPassword(namaUser, email, password, fakultas, jenisKelamin);
+
+                    } else {
+
+                        inputRePassword.requestFocus();
+                        Toast.makeText(this, "Password Tidak Cocok", Toast.LENGTH_SHORT).show();
                     }
+
+                } else {
+                    inputEmail.requestFocus();
+                    inputEmail.setError("Masukan email dengan benar");
                 }
-            });
+
+            } else {
+                Toast.makeText(this, "Mohon Lengkapi Data", Toast.LENGTH_SHORT).show();
+            }
+
+        } else {
+
+            Toast.makeText(this, "Gambar tidak ditemukan", Toast.LENGTH_SHORT).show();
 
         }
 
@@ -286,16 +362,26 @@ public class SetupActivity extends AppCompatActivity {
         userMap.put("level", level);
         userMap.put("verifikasi", verifikasi);
 
-        firestore.collection("users").document(user_id).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+        firestore.collection("users").document(user).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
 
                     if (task.isSuccessful()) {
-                        Intent mainActivity = new Intent(SetupActivity.this, MainActivity.class);
-                        startActivity(mainActivity);
-                        finish();
+
+                        /*Allert pernyataan register berhasil*/
+                        AlertDialog.Builder alert = new AlertDialog.Builder(SetupActivity.this);
+                        alert.setMessage("Register Berhasil")
+                                .setCancelable(false)
+                                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        mAuth.signOut();
+                                        finish();
+                                    }
+                                }).show();
                         Toast.makeText(SetupActivity.this, "Data berhasil disimpan", Toast.LENGTH_SHORT).show();
+
                     } else {
                         Toast.makeText(SetupActivity.this, "Data gagal disimpan", Toast.LENGTH_SHORT).show();
                     }
@@ -307,7 +393,6 @@ public class SetupActivity extends AppCompatActivity {
         });
 
     }
-
 
     private void setImage() {
 

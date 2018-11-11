@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -20,8 +21,10 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.uirsos.www.uirsoskampus.Profile.ProfileActivity;
+import com.uirsos.www.uirsoskampus.Profile.SetupActivity;
 import com.uirsos.www.uirsoskampus.R;
 import com.uirsos.www.uirsoskampus.SignUp.LoginActivity;
+import com.uirsos.www.uirsoskampus.SignUp.RegisterActivity;
 import com.uirsos.www.uirsoskampus.Utils.BottomNavigationHelper;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.uirsos.www.uirsoskampus.Utils.SectionPagerAdapter;
@@ -33,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int ACTIVITY_NUM = 0;
 
     BottomNavigationViewEx defaultBottomNav, adminBottomNav;
-    String user_id;
+    String user_id, current_user_id;
     //firebase
     private FirebaseAuth mAuth;
     private FirebaseFirestore firebaseFirestore;
@@ -95,7 +98,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Current data: " + documentSnapshot.getData());
 
                     String level = documentSnapshot.getString("level");
-                    if (level.equals("admin")){
+                    assert level != null;
+                    if (level.equals("admin")) {
                         defaultBottomNav.setVisibility(View.GONE);
                         adminBottomNav.setVisibility(View.VISIBLE);
                         BottomNavigationHelper.setupBottomNavigationView(adminBottomNav);
@@ -103,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                         Menu menu = adminBottomNav.getMenu();
                         MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
                         menuItem.setChecked(true);
-                    } else{
+                    } else {
                         //jika level bukan admin maka menu nya cuman ada menu home dan profile
                         adminBottomNav.setVisibility(View.GONE);
                         defaultBottomNav.setVisibility(View.VISIBLE);
@@ -129,10 +133,43 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
-            Intent intentLogin = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intentLogin);
-            finish();
+            sendToMain();
+        } else {
+
+            current_user_id = mAuth.getCurrentUser().getUid();
+
+            firebaseFirestore.collection("users").document(current_user_id).get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                            if (task.isSuccessful()) {
+                                if (!task.getResult().exists()) {
+
+                                    Intent setupIntent = new Intent(MainActivity.this, SetupActivity.class);
+                                    startActivity(setupIntent);
+                                    finish();
+
+                                } else {
+
+                                }
+                            } else {
+
+                                String errorMessage = task.getException().getMessage();
+                                Toast.makeText(MainActivity.this, "Error + " + errorMessage, Toast.LENGTH_SHORT).show();
+
+                            }
+
+                        }
+                    });
+
         }
+    }
+
+    private void sendToMain() {
+        Intent intentLogin = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intentLogin);
+        finish();
     }
 
 }

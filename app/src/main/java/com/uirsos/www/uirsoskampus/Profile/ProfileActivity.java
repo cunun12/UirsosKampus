@@ -62,7 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore firebaseFirestore;
     private String user_id;
-    private String TAG= "profileActivity";
+    private String TAG = "profileActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,11 +118,11 @@ public class ProfileActivity extends AppCompatActivity {
 
         firebaseFirestore.collection("posting").whereEqualTo("user_id", user_id)
                 .addSnapshotListener(ProfileActivity.this, new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
 
-            }
-        });
+                    }
+                });
 
         firebaseFirestore.collection("posting")
                 .whereEqualTo("user_id", user_id)
@@ -191,6 +191,11 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 
     private void setupBottomNavigation() {
 
@@ -207,7 +212,7 @@ public class ProfileActivity extends AppCompatActivity {
                     Log.d(TAG, "Current data: " + documentSnapshot.getData());
 
                     String level = documentSnapshot.getString("level");
-                    if (level.equals("admin")){
+                    if (level.equals("admin")) {
                         defaultBottomNav.setVisibility(View.GONE);
                         adminBottomNav.setVisibility(View.VISIBLE);
                         BottomNavigationHelper.setupBottomNavigationView(adminBottomNav);
@@ -215,7 +220,7 @@ public class ProfileActivity extends AppCompatActivity {
                         Menu menu = adminBottomNav.getMenu();
                         MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
                         menuItem.setChecked(true);
-                    } else{
+                    } else {
                         //jika level bukan admin maka menu nya cuman ada menu home dan profile
                         adminBottomNav.setVisibility(View.GONE);
                         defaultBottomNav.setVisibility(View.VISIBLE);

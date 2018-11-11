@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -56,6 +58,8 @@ public class StatusFragment extends Fragment {
     private FirebaseFirestore firebaseFirestore;
     private String users_id;
     private String fakultas_users;
+    private LinearLayout linearNoPost;
+    private TextView textFakultas;
 
     private DocumentSnapshot lastVisible;
     private Boolean isFirstPageFirstLoad = true; // untuk membuka halaman pertama diambil
@@ -78,7 +82,8 @@ public class StatusFragment extends Fragment {
 
         listStatus = view.findViewById(R.id.statusPost);
         btnAddPost = view.findViewById(R.id.btn_Post);
-
+        linearNoPost = view.findViewById(R.id.noPost);
+        textFakultas = view.findViewById(R.id.txtFakultas);
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -112,7 +117,7 @@ public class StatusFragment extends Fragment {
                             if (documentSnapshot != null && documentSnapshot.exists()) {
 
                                 fakultas_users = documentSnapshot.getString("fakultas");
-                                Log.d(TAG, "ko fakultas : " + fakultas_users);
+//                                Log.d(TAG, "ko fakultas : " + fakultas_users);
                                 dataView();
 
                             } else {
@@ -149,7 +154,7 @@ public class StatusFragment extends Fragment {
 
         Query firstPost = firebaseFirestore.collection("posting")
                 .orderBy("postTime", Query.Direction.DESCENDING);
-        firstPost.addSnapshotListener(Objects.requireNonNull(getActivity()), new EventListener<QuerySnapshot>() {
+        firstPost.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot orderTime, @javax.annotation.Nullable FirebaseFirestoreException e) {
 
@@ -158,11 +163,15 @@ public class StatusFragment extends Fragment {
                     return;
                 }
 
+                assert orderTime != null;
                 if (orderTime.isEmpty()) {
 
-                    Toast.makeText(getActivity(), "titik", Toast.LENGTH_SHORT).show();
+                    linearNoPost.setVisibility(View.VISIBLE);
+                    textFakultas.setText(fakultas_users);
+//                    Toast.makeText(getActivity(), "titik", Toast.LENGTH_SHORT).show();
 
                 } else {
+
                     lastVisible = orderTime.getDocuments().get(orderTime.size() - 1);
 
                     for (DocumentChange doc : orderTime.getDocumentChanges()) {
@@ -174,6 +183,7 @@ public class StatusFragment extends Fragment {
                                 String fakultas = doc.getDocument().getString("fakultas");
 
                                 if (fakultas != null) {
+
 
                                     if (fakultas.equals(fakultas_users)) {
 
@@ -190,16 +200,11 @@ public class StatusFragment extends Fragment {
 
                                     }
 
+                                } else {
+                                    linearNoPost.setVisibility(View.GONE);
                                 }
 
                                 break;
-                            case MODIFIED:
-                                Log.d(TAG, "Modified city: " + doc.getDocument().getData());
-                                break;
-                            case REMOVED:
-                                Log.d(TAG, "Removed city: " + doc.getDocument().getData());
-                                break;
-
                         }
 
                     }
@@ -222,6 +227,7 @@ public class StatusFragment extends Fragment {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot orderTime, @javax.annotation.Nullable FirebaseFirestoreException e) {
 
+                assert orderTime != null;
                 if (!orderTime.isEmpty()) {
 
                     lastVisible = orderTime.getDocuments().get(orderTime.size() - 1);

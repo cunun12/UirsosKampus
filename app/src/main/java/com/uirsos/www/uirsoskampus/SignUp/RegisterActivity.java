@@ -23,6 +23,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,15 +61,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
             String getNpm = inputNpm.getText().toString().trim();
-            String getEmail = inputEmail.getText().toString().trim();
+//            String getEmail = inputEmail.getText().toString().trim();
 
             if (!getNpm.isEmpty()) {
                 btnSend.setEnabled(true);
             }
-
-            if (!getEmail.isEmpty()) {
-                btnSend.setEnabled(true);
-            }
+//
+//            if (!getEmail.isEmpty()) {
+//                btnSend.setEnabled(true);
+//            }
 //            btnSend.setEnabled(!getNpm.isEmpty() && !getEmail.isEmpty());
 
         }
@@ -144,65 +146,21 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.getResult().isEmpty()) {
                             Toast.makeText(RegisterActivity.this, "NPM dapat digunakan", Toast.LENGTH_SHORT).show();
-                            lineNpm.setVisibility(View.GONE);
-                            btnSend.setEnabled(false);
+
                             progressReg.setVisibility(View.GONE);
-                            lanjutRegist();
+                            Intent setupIntent = new Intent(RegisterActivity.this, SetupActivity.class);
+                            setupIntent.putExtra("npm", getNpm);
+                            startActivity(setupIntent);
+//                            lanjutRegist();
                         } else {
                             progressReg.setVisibility(View.GONE);
                             Toast.makeText(RegisterActivity.this, "NPM sudah terdaftar", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
-
-//        StringRequest requestCheck = new StringRequest(Request.Method.POST, APIServer.check,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        Log.d(TAG, "onResponse: " + response.toString());
-//                        try {
-//                            JSONObject res = new JSONObject(response);
-//
-//                            String check = res.getString("check");
-//
-//                            if (check.equals("1")) {
-//                                Log.d(TAG, "onResponse: 1");
-//                                Toast.makeText(RegisterActivity.this, "NPM sudah terdaftar", Toast.LENGTH_SHORT).show();
-//                            } else {
-//                                Log.d(TAG, "onResponse: 0");
-//                                Toast.makeText(RegisterActivity.this, "NPM dapat digunakan", Toast.LENGTH_SHORT).show();
-//                                //                            lineNpm.setVisibility(View.GONE);
-////                            btnSend.setEnabled(false);
-////                            lanjutRegist();
-//                            }
-//
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        Log.d(TAG, "onErrorResponse: " + error);
-//                        Toast.makeText(RegisterActivity.this, "Ini error nya " + error, Toast.LENGTH_SHORT).show();
-//                    }
-//                }) {
-//
-//            @Override
-//            protected Map<String, String> getParams() throws AuthFailureError {
-//
-//                Map<String, String> check = new HashMap<>();
-//                check.put("npm", getNpm);
-//
-//                return check;
-//            }
-//        };
-//
-//        RequestHandler.getInstance(RegisterActivity.this).addToRequestQueue(requestCheck);
-//
-
     }
+
+    /*bagian yang tertunda*/
 
     private void lanjutRegist() {
 
@@ -264,8 +222,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                     Toast.makeText(RegisterActivity.this, "Masukan semua data yang diperlukan", Toast.LENGTH_SHORT).show();
                     progressReg.setVisibility(View.GONE);
-//                    infoError.setVisibility(View.VISIBLE);
-//                    infoError.setText("Masukan semua data");
 
                 }
 
@@ -281,11 +237,25 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 if (task.isSuccessful()) {
                     progressReg.setVisibility(View.GONE);
                     Toast.makeText(RegisterActivity.this, "Berhasil Registrasi", Toast.LENGTH_SHORT).show();
-                    Intent setupIntent = new Intent(RegisterActivity.this, SetupActivity.class);
-                    setupIntent.putExtra("npm", npm);
-                    setupIntent.putExtra("email", email);
-                    startActivity(setupIntent);
-                    finish();
+
+                    /*proses penyimpanan data npm dan email ke users*/
+                    String current_user = task.getResult().getUser().getUid();
+                    Map<String, String> userMap = new HashMap<>();
+                    userMap.put("npm", npm);
+                    userMap.put("email", email);
+                    Toast.makeText(RegisterActivity.this, "id user " + userMap, Toast.LENGTH_SHORT).show();
+
+                    firebaseFirestore.collection("users").document(current_user).set(userMap)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+
+                                    Intent setupIntent = new Intent(RegisterActivity.this, SetupActivity.class);
+                                    startActivity(setupIntent);
+
+                                }
+                            });
+
                 } else {
                     Toast.makeText(RegisterActivity.this, "Maaf, password harus berisi 6 karakter", Toast.LENGTH_SHORT).show();
                 }

@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/contraint"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.uirsos.www.uirsoskampus.Profile.SetupActivity">
@@ -62,32 +63,121 @@
             </RelativeLayout>
         </LinearLayout>
 
-        <!--update data nama pengguna dan jurusan user-->
+        <!--update data pengguna-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
             android:orientation="vertical">
 
-
-            <EditText
-                android:id="@+id/namaPengguna"
+            <!--Nama-->
+            <LinearLayout
+                android:id="@+id/line_nama"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nama"
-                android:inputType="textPersonName"
-                android:textColorHint="@color/cardview_light_background" />
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
+                    <EditText
+                        android:id="@+id/namaPengguna"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Nama"
+                        android:inputType="textPersonName"
+                        android:textColorHint="@color/cardview_light_background" />
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <!--Email-->
+            <LinearLayout
+                android:id="@+id/line_Email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp">
+
+                    <EditText
+                        android:id="@+id/daftar_Email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/email"
+                        android:inputType="textEmailAddress" />
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <!--Password-->
+            <LinearLayout
+                android:id="@+id/line_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    app:passwordToggleEnabled="true">
+
+                    <EditText
+                        android:id="@+id/daftar_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:hint="@string/password"
+                        android:inputType="textPassword" />
+
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+            <!--Re-Password-->
+            <LinearLayout
+                android:id="@+id/line_Re-password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:passwordToggleEnabled="true">
+
+                    <EditText
+                        android:id="@+id/daftar_repassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:hint="@string/confrim_password"
+                        android:inputType="textPassword" />
+
+                </android.support.design.widget.TextInputLayout>
+
+
+            </LinearLayout>
 
             <TextView
-                android:layout_marginTop="10dp"
                 android:id="@+id/fakultas_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
                 android:textAllCaps="true"
                 android:textSize="14sp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/statushint"
@@ -140,7 +230,7 @@
                 android:id="@+id/gender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <com.rey.material.widget.Button
                 android:id="@+id/btn_simpan"
@@ -154,9 +244,9 @@
 
         <ProgressBar
             android:id="@+id/progressBar"
-            android:visibility="gone"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

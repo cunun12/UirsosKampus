@@ -97,6 +97,12 @@ public class FriendActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
     private void loadHistory() {
 
         firebaseFirestore.collection("posting")
@@ -151,10 +157,10 @@ public class FriendActivity extends AppCompatActivity {
                                     .load(image)
                                     .into(imgProfile);
 
-                            firebaseFirestore.collection("users/"+userId+"/status").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            firebaseFirestore.collection("users/" + userId + "/status").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    for (DocumentSnapshot doc : task.getResult()){
+                                    for (DocumentSnapshot doc : task.getResult()) {
                                         String status = doc.getString("status");
 
                                         textStatus.setText(status);
