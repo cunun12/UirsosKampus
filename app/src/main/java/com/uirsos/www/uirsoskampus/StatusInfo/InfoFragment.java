@@ -3,6 +3,7 @@ package com.uirsos.www.uirsoskampus.StatusInfo;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -40,7 +41,7 @@ import static android.content.ContentValues.TAG;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InfoFragment extends Fragment {
+public class InfoFragment extends Fragment{
 
     private RecyclerView listBerita;
     private GridLayoutManager gridBerita;
@@ -48,6 +49,9 @@ public class InfoFragment extends Fragment {
     private AdapterBerita adapterBerita;
     private SwipeRefreshLayout refreshBerita;
     private TextView infoKoneksi;
+
+    Handler handler;
+    Runnable runnable;
 
 
     public InfoFragment() {
@@ -76,6 +80,20 @@ public class InfoFragment extends Fragment {
         listBerita.setLayoutManager(gridBerita);
         listBerita.setAdapter(adapterBerita);
 
+        refreshBerita.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        itemsberita.clear();
+                        refreshBerita.setRefreshing(false);
+//                        adapterBerita.notifyDataSetChanged();
+                        loadBerita();
+                    }
+                }, 5000);
+            }
+        });
 
         loadBerita();
     }
@@ -87,7 +105,7 @@ public class InfoFragment extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         infoKoneksi.setVisibility(View.GONE);
-                        Log.d(TAG, "onResponse: " + response.toString());
+                        Log.d(TAG, "onResponse: " + response);
                         try {
                             JSONArray array = new JSONArray(response);
 
@@ -146,4 +164,5 @@ public class InfoFragment extends Fragment {
         RequestHandler.getInstance(getActivity()).addToRequestQueue(request);
 
     }
+
 }

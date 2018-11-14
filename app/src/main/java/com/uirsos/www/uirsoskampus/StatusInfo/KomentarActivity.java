@@ -1,5 +1,6 @@
 package com.uirsos.www.uirsoskampus.StatusInfo;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -49,7 +50,7 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
     AdapterKomentar adapterKomentar;
     List<String> strings;
     private String idPost;
-    private ImageView sendKomentar;
+    private ImageView btnBack;
     private EditText textKomentar1;
     private EditText textKomentar2;
     /*Firebase*/
@@ -68,9 +69,10 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
         rvKomentar = findViewById(R.id.list_komentar);
         textKomentar1 = findViewById(R.id.messageKomentar1);
         textKomentar2 = findViewById(R.id.messageKomentar2);
-        sendKomentar = findViewById(R.id.send_Komentar);
+        ImageView sendKomentar = findViewById(R.id.send_Komentar);
         sendKomentar.setOnClickListener(this);
-
+        btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(this);
 
         /*firebase*/
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -115,7 +117,7 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
                                 }
                                 // membuat RecyclerView otomatis
                                 // scroll ke bawah setelah nama baru ditambahkan
-                                rvKomentar.scrollToPosition(listKomentar.size()-1);
+                                rvKomentar.scrollToPosition(listKomentar.size() - 1);
                                 adapterKomentar.notifyDataSetChanged();
 
 
@@ -133,7 +135,18 @@ public class KomentarActivity extends AppCompatActivity implements View.OnClickL
         switch (view.getId()) {
 
             case R.id.send_Komentar:
+
                 kirimKomentar();
+
+                break;
+
+            case R.id.btnBack:
+
+                Intent backStatus = new Intent(this, MainActivity.class);
+                backStatus.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(backStatus);
+                finish();
+
                 break;
 
             default:
