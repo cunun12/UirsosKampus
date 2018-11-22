@@ -49,9 +49,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="Masukan Data"
-            android:textAppearance="@style/TextAppearance.AppCompat.Tooltip"
-            android:textColor="#fff" />
+            android:text="Check NPM dulu! Pastikan NPM belum pernah digunakan"
+            android:textAppearance="@style/Material.TextAppearance.SimpleDialog" />
 
         <!--Data-->
         <LinearLayout
@@ -133,7 +132,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/belum_punya_akun"
+                android:text="@string/sudah_punya_akun"
                 android:textAppearance="@style/Material.TextAppearance.SimpleDialog.Light" />
 
             <TextView

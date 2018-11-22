@@ -2,38 +2,27 @@ package com.uirsos.www.uirsoskampus.SignUp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PatternMatcher;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.uirsos.www.uirsoskampus.Profile.ProfileActivity;
 import com.uirsos.www.uirsoskampus.R;
 import com.uirsos.www.uirsoskampus.StatusInfo.MainActivity;
-
-import java.util.regex.Matcher;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -41,7 +30,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     //widget
     private Button btnSend;
-    private EditText inputNpm, inputEmail, inputPassword;
+    private EditText inputNpm, inputEmail;
 
     /*TextWatcher untuk NPM dan Email*/
     private TextWatcher npmTextWatcher = new TextWatcher() {
@@ -62,13 +51,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         public void afterTextChanged(Editable editable) {
         }
     };
-    private TextView btnDaftar;
-    private LinearLayout lineNpm, lineEmail, linePassword;
     private ProgressBar loginProgres;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
-    private String current_user_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,14 +66,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         firebaseAuth = FirebaseAuth.getInstance();
 
         //widget
-        btnDaftar = findViewById(R.id.txtViewRegist);
+        TextView btnDaftar = findViewById(R.id.txtViewRegist);
         btnSend = findViewById(R.id.btn_Login);
-        lineNpm = findViewById(R.id.line_Npm);
         inputNpm = findViewById(R.id.login_Npm);
-        lineEmail = findViewById(R.id.line_Email);
         inputEmail = findViewById(R.id.login_Email);
-        linePassword = findViewById(R.id.line_password);
-        inputPassword = findViewById(R.id.login_password);
         loginProgres = findViewById(R.id.progressBar);
 
         //onclick
@@ -139,44 +121,48 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             loginProgres.setVisibility(View.GONE);
                             if (!task.getResult().isEmpty()) {
 
-                                Toast.makeText(LoginActivity.this, "Lanjut", Toast.LENGTH_SHORT).show();
-
-                                btnSend.setEnabled(false);
-                                lineNpm.setVisibility(View.GONE);
-                                lineEmail.setVisibility(View.GONE);
-                                linePassword.setVisibility(View.VISIBLE);
-                                btnSend.setEnabled(true);
-                                btnSend.setText("Login");
-                                btnSend.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-
-                                        loginProgres.setVisibility(View.VISIBLE);
-                                        String email = inputEmail.getText().toString().trim();
-                                        String getPassword = inputPassword.getText().toString();
-
-                                        firebaseAuth.signInWithEmailAndPassword(email, getPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<AuthResult> task) {
-
-                                                Intent intentProfile = new Intent(LoginActivity.this, MainActivity.class);
-                                                startActivity(intentProfile);
-                                                finish();
-
-                                                loginProgres.setVisibility(View.GONE);
-
-                                            }
-
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(LoginActivity.this, "Maaf password yang anda masukan salah", Toast.LENGTH_SHORT).show();
-                                                loginProgres.setVisibility(View.GONE);
-                                            }
-                                        });
-                                    }
-                                });
-
+                                Intent npmEmail = new Intent(LoginActivity.this, Password.class);
+                                npmEmail.putExtra("email", getEmail);
+                                startActivity(npmEmail);
+                                finish();
+//   bagian tertunda
+//                                Toast.makeText(LoginActivity.this, "NPM dan Email Cocok", Toast.LENGTH_SHORT).show();
+//                                textLogin.setText("Isi Password dan Login");
+//                                btnSend.setEnabled(false);
+//                                lineNpm.setVisibility(View.GONE);
+//                                lineEmail.setVisibility(View.GONE);
+//                                linePassword.setVisibility(View.VISIBLE);
+//                                btnSend.setEnabled(true);
+//                                btnSend.setText("Masuk");
+//                                btnSend.setOnClickListener(new View.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(View view) {
+//
+//                                        loginProgres.setVisibility(View.VISIBLE);
+//                                        String email = inputEmail.getText().toString().trim();
+//                                        String getPassword = inputPassword.getText().toString();
+//
+//                                        firebaseAuth.signInWithEmailAndPassword(email, getPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//                                            @Override
+//                                            public void onComplete(@NonNull Task<AuthResult> task) {
+//
+//                                                Intent intentProfile = new Intent(LoginActivity.this, MainActivity.class);
+//                                                startActivity(intentProfile);
+//                                                finish();
+//
+//                                                loginProgres.setVisibility(View.GONE);
+//
+//                                            }
+//
+//                                        }).addOnFailureListener(new OnFailureListener() {
+//                                            @Override
+//                                            public void onFailure(@NonNull Exception e) {
+//                                                Toast.makeText(LoginActivity.this, "Maaf Password yang anda masukan salah", Toast.LENGTH_SHORT).show();
+//                                                loginProgres.setVisibility(View.GONE);
+//                                            }
+//                                        });
+//                                    }
+//                                });
                             } else {
                                 loginProgres.setVisibility(View.GONE);
                                 Toast.makeText(LoginActivity.this, "Login gagal mohon perika kembali NPM dan Email anda", Toast.LENGTH_SHORT).show();

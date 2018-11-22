@@ -190,7 +190,7 @@ public class SetupActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are You Sure Want to Exit?")
+        builder.setMessage("Apakah anda yakin untuk berhenti mendaftar?")
                 .setCancelable(false)//tidak bisa tekan tombol back
                 //jika pilih yess
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {

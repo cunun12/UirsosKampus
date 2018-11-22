@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">UirsosKampus</string>
+    <string name="app_name">Uirsos</string>
     <string name="belum_punya_akun">Belum punya akun?</string>
     <string name="sudah_punya_akun">Sudah punya akun?</string>
     <string name="check">Check</string>
@@ -37,5 +37,6 @@
     <string name="verifikasi_akun">Verifikasi Akun</string>
     <string name="descript">Dengan mengirimkan photo KTM dan NPM anda mengajukan untuk terdaftar sebagai mahasiswa</string>
     <string name="todo">TODO</string>
+    <string name="title_activity_password">password</string>
 
 </resources>

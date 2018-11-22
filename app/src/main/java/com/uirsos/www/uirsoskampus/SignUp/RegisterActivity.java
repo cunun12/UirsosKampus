@@ -257,7 +257,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             });
 
                 } else {
-                    Toast.makeText(RegisterActivity.this, "Maaf, password harus berisi 6 karakter", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "Maaf, Password harus berisi 6 karakter", Toast.LENGTH_SHORT).show();
                 }
             }
         });
