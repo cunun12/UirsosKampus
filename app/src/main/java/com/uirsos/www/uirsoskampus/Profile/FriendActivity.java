@@ -67,7 +67,7 @@ public class FriendActivity extends AppCompatActivity {
         textNpm = findViewById(R.id.txtNPM);
         textNama = findViewById(R.id.txtNamaPengguna);
         textGender = findViewById(R.id.txtJenisKelamin);
-        textStatus = findViewById(R.id.txtStatusUser);
+//        textStatus = findViewById(R.id.txtStatusUser);
         textFakultas = findViewById(R.id.txtFakultas);
         listHistori = findViewById(R.id.historyUser);
         defaultBottomNav = (BottomNavigationViewEx) findViewById(R.id.defaultBottom);
@@ -157,16 +157,16 @@ public class FriendActivity extends AppCompatActivity {
                                     .load(image)
                                     .into(imgProfile);
 
-                            firebaseFirestore.collection("users/" + userId + "/status").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    for (DocumentSnapshot doc : task.getResult()) {
-                                        String status = doc.getString("status");
-
-                                        textStatus.setText(status);
-                                    }
-                                }
-                            });
+//                            firebaseFirestore.collection("users/" + userId + "/status").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                                    for (DocumentSnapshot doc : task.getResult()) {
+//                                        String status = doc.getString("status");
+//
+//                                        textStatus.setText(status);
+//                                    }
+//                                }
+//                            });
                         }
                     }
                 });

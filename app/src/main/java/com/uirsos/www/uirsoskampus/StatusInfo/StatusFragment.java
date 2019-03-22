@@ -227,6 +227,11 @@ public class StatusFragment extends Fragment {
             @Override
             public void onEvent(@javax.annotation.Nullable QuerySnapshot orderTime, @javax.annotation.Nullable FirebaseFirestoreException e) {
 
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+
                 assert orderTime != null;
                 if (!orderTime.isEmpty()) {
 

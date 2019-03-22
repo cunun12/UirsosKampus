@@ -5,9 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.uirsos.www.uirsoskampus.SignUp.LoginActivity;
+import com.uirsos.www.uirsoskampus.SignUp.WelcomeLogin;
 
 public class ScreenActivity extends AppCompatActivity {
 
@@ -16,7 +17,7 @@ public class ScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_screen);
 
-        TextView logo = findViewById(R.id.logoUirsos);
+        ImageView logo = findViewById(R.id.logo);
         TextView desc = findViewById(R.id.deskripsiUirsos);
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.myanim);
         logo.setAnimation(anim);
@@ -28,7 +29,7 @@ public class ScreenActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        final Intent i = new Intent(ScreenActivity.this, LoginActivity.class);
+        final Intent i = new Intent(ScreenActivity.this, WelcomeLogin.class);
 
         Thread timer = new Thread(){
             @Override

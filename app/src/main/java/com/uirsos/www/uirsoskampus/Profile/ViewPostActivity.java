@@ -1,9 +1,11 @@
 package com.uirsos.www.uirsoskampus.Profile;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -97,14 +99,14 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
         postId = post.getStringExtra("postId");
         userId = post.getStringExtra("userId");
 
-        Log.d(TAG, "onCreate: userId " +postId);
+        Log.d(TAG, "onCreate: userId " + postId);
 
-        Log.d(TAG, "onCreate: currendUserID " +currentUserId);
+        Log.d(TAG, "onCreate: currendUserID " + currentUserId);
 
-        if (!currentUserId.equals(userId)){
+        if (!currentUserId.equals(userId)) {
             Log.d(TAG, "onCreate: Hapus Hilang");
             hapus.setVisibility(View.GONE);
-        } else{
+        } else {
             Log.d(TAG, "onCreate: Hapus Hilang");
             hapus.setVisibility(View.VISIBLE);
         }
@@ -131,7 +133,7 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void fitureLikes() {
-                    /*Start Fitur Like*/
+        /*Start Fitur Like*/
 
         //getCount
         firebaseFirestore.collection("posting/" + postId + "/Likes").addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -142,7 +144,7 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
                 if (documentSnapshots != null) {
 
                     int count = documentSnapshots.size();
-                    postLikeCount.setText(count + " " + "Likes");
+                    postLikeCount.setText(count + " " + "Suka");
 
                 } else {
 
@@ -179,6 +181,14 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent i = new Intent(Intent.ACTION_MAIN);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        finish();
+    }
 
     @Override
     public void onClick(View view) {
@@ -236,19 +246,34 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
 
             case R.id.hapus:
                 if (currentUserId.equals(userId)) {
-                    firebaseFirestore.collection("posting").document(postId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.getResult().exists()) {
-                                Log.d(TAG, "Datanya: " + task.getResult().getData());
+                    AlertDialog.Builder delete = new AlertDialog.Builder(this);
+                    delete.setTitle("Hapus");
+                    delete.setMessage("Apakah anda yakin menghapus postingan ini?")
+                            .setPositiveButton("Hapus", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    firebaseFirestore.collection("posting").document(postId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if (task.getResult().exists()) {
+                                                Log.d(TAG, "Datanya: " + task.getResult().getData());
 
-                                firebaseFirestore.collection("posting").document(postId).delete();
-                                Intent iProfile = new Intent(ViewPostActivity.this, ProfileActivity.class);
-                                startActivity(iProfile);
-                                finish();
-                            }
-                        }
-                    });
+                                                firebaseFirestore.collection("posting").document(postId).delete();
+                                                Intent iProfile = new Intent(ViewPostActivity.this, ProfileActivity.class);
+                                                startActivity(iProfile);
+                                                finish();
+
+                                            }
+                                        }
+                                    });
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            }).show();
                 }
 
                 break;

@@ -31,7 +31,6 @@
                     android:layout_marginRight="5dp"
                     android:src="@drawable/ic_back" />
 
-
                 <TextView
                     android:id="@+id/nama_user"
                     android:layout_width="wrap_content"
@@ -168,8 +167,7 @@
                         android:id="@+id/post_likeCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:text="0 Suka" />
+                        android:layout_marginLeft="10dp" />
                 </LinearLayout>
 
                 <LinearLayout

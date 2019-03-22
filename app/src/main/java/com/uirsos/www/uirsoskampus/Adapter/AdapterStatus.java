@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -55,11 +56,12 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
     public List<Status_PostList> postLists;
     Context context;
 
+    RequestManager glide;
+
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
 
     public AdapterStatus(List<Status_PostList> postList) {
-
         this.postLists = postList;
     }
 
@@ -292,7 +294,7 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
         private LinearLayout btnLikePost, btnKomentar;
         private LinearLayout lineUser;
 
-        public StatusHolder(View itemView) {
+        private StatusHolder(View itemView) {
             super(itemView);
 
             mView = itemView;
@@ -303,12 +305,12 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
             lineUser = mView.findViewById(R.id.line_user);
         }
 
-        public void setDescText(String text) {
+        private void setDescText(String text) {
             descView = mView.findViewById(R.id.desc_post);
             descView.setText(text);
         }
 
-        public void setPostImage(String downloadUri) {
+        private void setPostImage(String downloadUri) {
 
             postImage = mView.findViewById(R.id.post_image);
             Glide.with(context)
@@ -324,8 +326,9 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
 
         public void updateLikeCount(int count) {
             postLikeCount = mView.findViewById(R.id.post_likeCount);
-            postLikeCount.setText(count + " Likes");
+            postLikeCount.setText(count + " Suka");
         }
+
 
         @SuppressLint("CheckResult")
         public void setUserData(String name, String image) {
@@ -336,7 +339,7 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
 
             RequestOptions placeholderrequest = new RequestOptions();
             placeholderrequest.placeholder(R.drawable.defaulticon);
-            Glide.with(context)
+            Glide.with(context.getApplicationContext())
                     .applyDefaultRequestOptions(placeholderrequest)
                     .load(image)
                     .into(postUserImage);

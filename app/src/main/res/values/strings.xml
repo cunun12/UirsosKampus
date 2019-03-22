@@ -3,7 +3,7 @@
     <string name="belum_punya_akun">Belum punya akun?</string>
     <string name="sudah_punya_akun">Sudah punya akun?</string>
     <string name="check">Check</string>
-    <string name="regitrasi">DAFTAR</string>
+    <string name="regitrasi">Registrasi</string>
     <string name="masuk">MASUK</string>
     <string name="npm_1235xxxxx">NPM (1235xxxxx)</string>
     <string name="email">Email (name@gmail.com)</string>
@@ -25,7 +25,7 @@
 
     <string name="status">STATUS</string>
     <string name="pikirkan">Apa yang anda pikirkan</string>
-    <string name="info">INFO KAMPUS</string>
+    <string name="info">BERITA KAMPUS</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -38,5 +38,14 @@
     <string name="descript">Dengan mengirimkan photo KTM dan NPM anda mengajukan untuk terdaftar sebagai mahasiswa</string>
     <string name="todo">TODO</string>
     <string name="title_activity_password">password</string>
+    <string name="Chat">Chat</string>
+    <string name="login_with_email_student">login student</string>
+    <string name="textsaling">Saling berbagi informasi seputar kampus dengan teman!</string>
+    <string name="selamatDatang">Selamat datang di UIRSOS!</string>
+    <string name="universitas_islam_riau">Universitas Islam Riau</string>
+    <string name="menggunakan_akun_student">Menggunakan Akun Student</string>
+    <string name="nama_belakang">Nama Belakang</string>
+    <string name="nama_depan">Nama Depan</string>
+    <string name="masukan_nama_anda">Masukan Nama Anda</string>
 
 </resources>

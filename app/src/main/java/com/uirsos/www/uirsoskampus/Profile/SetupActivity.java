@@ -24,6 +24,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -49,12 +50,9 @@ import android.widget.Spinner;
 
 import android.widget.TextView;
 
-import com.rey.material.widget.SnackBar;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.uirsos.www.uirsoskampus.R;
-import com.uirsos.www.uirsoskampus.SignUp.RegisterActivity;
-import com.uirsos.www.uirsoskampus.StatusInfo.MainActivity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +66,8 @@ public class SetupActivity extends AppCompatActivity {
     private RadioGroup radioGroup;
     private EditText inputNama, inputEmail, inputPassword, inputRePassword;
     private CircleImageView setupImage;
-    private TextView setKelamin, kategoriFakultas;
+    private TextView setKelamin, kategoriFakultas, textSetup;
+    private LinearLayout linePassword, lineRepassword, lineEmail;
     private String[] kategori = {
             "Fakultas Teknik",
             "Fakultas Hukum",
@@ -114,10 +113,14 @@ public class SetupActivity extends AppCompatActivity {
         //widget
         progressBar = findViewById(R.id.progressBar);
         btnSimpan = findViewById(R.id.btn_simpan);
+        textSetup = findViewById(R.id.textsetup);
         inputNama = findViewById(R.id.namaPengguna);
         inputEmail = findViewById(R.id.daftar_Email);
         inputPassword = findViewById(R.id.daftar_password);
         inputRePassword = findViewById(R.id.daftar_repassword);
+        linePassword = findViewById(R.id.line_password);
+        lineRepassword = findViewById(R.id.line_Re_password);
+        lineEmail = findViewById(R.id.line_Email);
         setupImage = findViewById(R.id.imageProfil);
         setKelamin = findViewById(R.id.gender);
         setKelamin.setText(R.string.laki_laki);
@@ -136,27 +139,18 @@ public class SetupActivity extends AppCompatActivity {
         final Intent updateData = getIntent();
         final int update = updateData.getIntExtra("update", 0);
         String updateNama = updateData.getStringExtra("nama");
-        String updateGender = updateData.getStringExtra("gender");
-        String updateFakultas = updateData.getStringExtra("fakultas");
         String imageUser = updateData.getStringExtra("image_profile");
         Log.d(TAG, "onCreate: image " + imageUser);
 
         if (update == 1) {
-            btnSimpan.setText("Update Data");
+            textSetup.setText("Data Profile");
+            btnSimpan.setText("Change");
             inputNama.setText(updateNama);
-            setKelamin.setText(updateGender);
-            kategoriFakultas.setText(updateFakultas);
-            kategoriFakultas.setVisibility(View.VISIBLE);
+            lineEmail.setVisibility(View.GONE);
+            linePassword.setVisibility(View.GONE);
+            lineRepassword.setVisibility(View.GONE);
             spinner.setVisibility(View.GONE);
-
-            RadioButton laki = findViewById(R.id.laki_laki);
-            RadioButton perempuan = findViewById(R.id.perempuan);
-
-            if (updateGender.equals("Laki-laki")) {
-                laki.setChecked(true);
-            } else {
-                perempuan.setChecked(true);
-            }
+            radioGroup.setVisibility(View.GONE);
 
             if (imageUser != null) {
                 mainImageURI = Uri.parse(imageUser);
@@ -187,6 +181,7 @@ public class SetupActivity extends AppCompatActivity {
         });
     }
 
+
     @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -210,7 +205,6 @@ public class SetupActivity extends AppCompatActivity {
     private void UpdateData() {
 
         final String nama = inputNama.getText().toString();
-        final String jenisKelamin = setKelamin.getText().toString();
         progressBar.setVisibility(View.VISIBLE);
         if (isChanged) {
 
@@ -221,18 +215,18 @@ public class SetupActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                     if (task.isSuccessful()) {
                         progressBar.setVisibility(View.GONE);
-                        updateStore(task, nama, jenisKelamin);
+                        updateStore(task, nama);
                     }
                 }
             });
 
         } else {
-            updateStore(null, nama, jenisKelamin);
+            updateStore(null, nama);
         }
 
     }
 
-    private void updateStore(Task<UploadTask.TaskSnapshot> task, String nama, String jenisKelamin) {
+    private void updateStore(Task<UploadTask.TaskSnapshot> task, String nama) {
 
         Uri download_uri;
         if (task != null) {
@@ -243,7 +237,6 @@ public class SetupActivity extends AppCompatActivity {
 
         Map<String, Object> updateMap = new HashMap<>();
         updateMap.put("nama_user", nama);
-        updateMap.put("jenis_kelamin", jenisKelamin);
         updateMap.put("imagePic", String.valueOf(download_uri));
 
         firestore.collection("users").document(user_id).update(updateMap)
@@ -371,9 +364,10 @@ public class SetupActivity extends AppCompatActivity {
 
                         /*Allert pernyataan register berhasil*/
                         AlertDialog.Builder alert = new AlertDialog.Builder(SetupActivity.this);
-                        alert.setMessage("Register Berhasil")
+                        alert.setTitle("Register Berhasil");
+                        alert.setMessage("Silakan login untuk menggunakan aplikasi")
                                 .setCancelable(false)
-                                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                .setPositiveButton("Login", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         mAuth.signOut();

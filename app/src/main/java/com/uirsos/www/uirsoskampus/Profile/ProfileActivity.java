@@ -51,8 +51,8 @@ public class ProfileActivity extends AppCompatActivity {
     //widget
     BottomNavigationViewEx defaultBottomNav, adminBottomNav;
     private CircleImageView imgProfile;
-    private TextView textNpm, textNama, textGender, textStatus, textFakultas;
-    private ImageView statusLine;
+    private TextView textNpm, textNama, textGender, textFakultas;
+//    private ImageView statusLine;
     private RecyclerView listHistori;
     private List<Status_PostList> postHistory;
     private AdapterHistory adapterHistory;
@@ -61,7 +61,7 @@ public class ProfileActivity extends AppCompatActivity {
     String image;
     private FirebaseAuth mAuth;
     private FirebaseFirestore firebaseFirestore;
-    private String user_id;
+    private String user_id, email;
     private String TAG = "profileActivity";
 
     @Override
@@ -78,10 +78,10 @@ public class ProfileActivity extends AppCompatActivity {
         textNpm = findViewById(R.id.txtNPM);
         textNama = findViewById(R.id.txtNamaPengguna);
         textGender = findViewById(R.id.txtJenisKelamin);
-        textStatus = findViewById(R.id.txtStatusUser);
+//        textStatus = findViewById(R.id.txtStatusUser);
         textFakultas = findViewById(R.id.txtFakultas);
         listHistori = findViewById(R.id.historyUser);
-        statusLine = findViewById(R.id.image_button);
+//        statusLine = findViewById(R.id.image_button);
         defaultBottomNav = (BottomNavigationViewEx) findViewById(R.id.defaultBottom);
         adminBottomNav = (BottomNavigationViewEx) findViewById(R.id.adminNavbar);
         adminBottomNav.setVisibility(View.GONE);
@@ -102,13 +102,13 @@ public class ProfileActivity extends AppCompatActivity {
 
         loadHistory();
 
-        statusLine.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intentStatus = new Intent(ProfileActivity.this, StatusActivity.class);
-                startActivity(intentStatus);
-            }
-        });
+//        statusLine.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intentStatus = new Intent(ProfileActivity.this, StatusActivity.class);
+//                startActivity(intentStatus);
+//            }
+//        });
 
         setupBottomNavigation();
 
@@ -158,6 +158,7 @@ public class ProfileActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
 
                             String npm = task.getResult().getString("npm");
+                            email = task.getResult().getString("email");
                             String nama = task.getResult().getString("nama_user");
                             String gender = task.getResult().getString("jenis_kelamin");
                             String fakultas = task.getResult().getString("fakultas");
@@ -175,16 +176,16 @@ public class ProfileActivity extends AppCompatActivity {
                                     .load(image)
                                     .into(imgProfile);
 
-                            firebaseFirestore.collection("users/" + user_id + "/status").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    for (DocumentSnapshot doc : task.getResult()) {
-                                        String status = doc.getString("status");
-
-                                        textStatus.setText(status);
-                                    }
-                                }
-                            });
+//                            firebaseFirestore.collection("users/" + user_id + "/status").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                                    for (DocumentSnapshot doc : task.getResult()) {
+//                                        String status = doc.getString("status");
+//
+//                                        textStatus.setText(status);
+//                                    }
+//                                }
+//                            });
                         }
                     }
                 });
@@ -244,22 +245,23 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
 
-        firebaseFirestore.collection("users").document(user_id).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        String verifikasi = task.getResult().getString("verifikasi");
+        getMenuInflater().inflate(R.menu.profile_menu, menu);
 
-                        if (!verifikasi.equals("valid")) {
-                            getMenuInflater().inflate(R.menu.verifikasi_menu, menu);
-                        } else {
-                            getMenuInflater().inflate(R.menu.profile_menu, menu);
-
-                        }
-
-                    }
-                });
-
+//        firebaseFirestore.collection("users").document(user_id).get()
+//                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        String verifikasi = task.getResult().getString("verifikasi");
+//
+//                        if (!verifikasi.equals("valid")) {
+//                            getMenuInflater().inflate(R.menu.verifikasi_menu, menu);
+//                        } else {
+//                            getMenuInflater().inflate(R.menu.profile_menu, menu);
+//
+//                        }
+//
+//                    }
+//                });
 
         return true;
 
@@ -270,19 +272,11 @@ public class ProfileActivity extends AppCompatActivity {
 
 
         switch (item.getItemId()) {
-
-            case R.id.verifikasi:
-
-                Intent intentVerifikasi = new Intent(ProfileActivity.this, VerifikasiAccount.class);
-                intentVerifikasi.putExtra("npm", textNpm.getText());
-                intentVerifikasi.putExtra("fakultas", textFakultas.getText());
-                startActivity(intentVerifikasi);
-
-                return true;
             case R.id.accountSetting:
 
                 Intent setupActivity = new Intent(ProfileActivity.this, SetupActivity.class);
                 setupActivity.putExtra("update", 1);
+                setupActivity.putExtra("email", email);
                 setupActivity.putExtra("nama", textNama.getText());
                 setupActivity.putExtra("gender", textGender.getText());
                 setupActivity.putExtra("fakultas", textFakultas.getText());

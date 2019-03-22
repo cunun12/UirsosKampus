@@ -49,11 +49,10 @@ public class DetailBerita extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent back = new Intent(DetailBerita.this, MainActivity.class);
-                startActivity(back);
-                finish();
+                DetailBerita.super.onBackPressed();
             }
         });
 
     }
+
 }

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".SignUp.RegistPertama">
+
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relatif2"
+        android:layout_alignParentTop="true"
+        android:clipToPadding="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:src="@mipmap/ic_logo_uirsos" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Buat Akun Uirsos"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/masukan_nama_anda" />
+                </LinearLayout>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/round_edittext"
+                    android:hint="@string/nama_depan"
+                    android:inputType="textCapWords"
+                    android:paddingStart="@dimen/fab_margin"
+                    android:paddingLeft="@dimen/fab_margin"
+                    android:textColorHint="@color/colorPrimary"
+                    tools:ignore="Autofill,LabelFor,RtlSymmetry" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/round_edittext"
+                    android:hint="@string/nama_belakang"
+                    android:inputType="textCapWords"
+                    android:paddingStart="@dimen/fab_margin"
+                    android:paddingLeft="@dimen/fab_margin"
+                    tools:ignore="Autofill,LabelFor,RtlSymmetry" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <RelativeLayout
+        android:id="@+id/relatif2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/round_bg"
+            android:text="Berikutnya"
+            android:onClick="goIdentitas"/>
+
+    </RelativeLayout>
+</RelativeLayout>

@@ -69,8 +69,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setupViewPager() {
         SectionPagerAdapter view = new SectionPagerAdapter(getSupportFragmentManager());
-        view.addFragment(new StatusFragment());// fragment 1
-        view.addFragment(new InfoFragment());//fragment 0
+        view.addFragment(new StatusFragment());// fragment 2
+        view.addFragment(new InfoFragment());//fragment 1
+        view.addFragment(new Chat()); // fragment 0
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.bodyContainer);
         viewPager.setAdapter(view);
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         tab.setupWithViewPager(viewPager);
 
         tab.getTabAt(1).setText(getString(R.string.info));
+        tab.getTabAt(2).setText(R.string.Chat);
         tab.getTabAt(0).setText(getString(R.string.status));
 
     }

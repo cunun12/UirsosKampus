@@ -110,19 +110,6 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/hariBerita"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Hari"
-                        android:textSize="10sp"
-                        tools:ignore="SmallSp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="," />
-
-                    <TextView
                         android:id="@+id/tanggalBerita"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

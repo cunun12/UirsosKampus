@@ -22,6 +22,7 @@
             android:paddingBottom="20dp">
 
             <TextView
+                android:id="@+id/textsetup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/masukan_data_profile"
@@ -120,8 +121,7 @@
                 android:id="@+id/line_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal">
+                android:gravity="center_horizontal">
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
@@ -179,22 +179,11 @@
                 android:textSize="14sp"
                 android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/statushint"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="10dp"
-                android:textAllCaps="true"
-                android:textSize="12sp"
-                android:visibility="gone" />
-
             <Spinner
                 android:id="@+id/kategorifakultas"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
-
 
             <RadioGroup
                 android:id="@+id/radioJk"

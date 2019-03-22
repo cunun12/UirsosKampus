@@ -130,48 +130,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
                         android:layout_marginTop="10dp"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:src="@drawable/ic_status"
-                            android:tint="@color/green" />
-
-                        <LinearLayout
-                            android:id="@+id/statusLine"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:weightSum="2">
-
-                            <TextView
-                                android:id="@+id/txtStatusUser"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:paddingLeft="20dp"
-                                android:paddingStart="20dp"
-                                android:text="@string/pikirkan"
-                                android:textStyle="bold|italic"
-                                tools:ignore="RtlSymmetry" />
-
-                            <ImageView
-                                android:id="@+id/image_button"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:layout_gravity="right"
-                                android:layout_weight="1"
-                                android:src="@drawable/ic_pencil" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
                         <ImageView

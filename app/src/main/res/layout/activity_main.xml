@@ -22,9 +22,10 @@
                 android:background="@color/blackgreen">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:textSize="12pt"
                     android:text="UIRSOS"
                     android:textAllCaps="true"
                     android:textColor="@color/bottomWhite" />
