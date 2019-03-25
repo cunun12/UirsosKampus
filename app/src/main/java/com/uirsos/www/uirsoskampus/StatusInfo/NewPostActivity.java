@@ -210,7 +210,7 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
                 @Override
                 public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
 
-                    final String downloadUri = task.getResult().getDownloadUrl().toString();
+//                    final String downloadUri = task.getResult().getDownloadUrl().toString();
 
                     if (task.isSuccessful()) {
 
@@ -236,11 +236,11 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                                String downloadThumbUri = taskSnapshot.getDownloadUrl().toString();
+//                                String downloadThumbUri = taskSnapshot.getDownloadUrl().toString();
 
                                 Map<String, Object> postMap = new HashMap<>();
-                                postMap.put("imagePost", downloadUri);
-                                postMap.put("image_thumb", downloadThumbUri);
+//                                postMap.put("imagePost", downloadUri);
+//                                postMap.put("image_thumb", downloadThumbUri);
                                 postMap.put("deskripsi", textKet);
                                 postMap.put("user_id", user_id);
                                 postMap.put("fakultas", fakultas);

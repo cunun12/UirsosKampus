@@ -230,7 +230,7 @@ public class SetupActivity extends AppCompatActivity {
 
         Uri download_uri;
         if (task != null) {
-            download_uri = task.getResult().getDownloadUrl();
+            download_uri = task.getResult().getUploadSessionUri();
         } else {
             download_uri = mainImageURI;
         }
@@ -338,7 +338,7 @@ public class SetupActivity extends AppCompatActivity {
     private void addStoreFirebase(Task<UploadTask.TaskSnapshot> task, final String npm, final String email, final String namaUser, final String jenisKelamin, final String fakultas) {
         final Uri downloadUri;
         if (task != null) {
-            downloadUri = task.getResult().getDownloadUrl();
+            downloadUri = task.getResult().getUploadSessionUri();
         } else {
             downloadUri = mainImageURI;
         }

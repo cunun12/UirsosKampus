@@ -30,7 +30,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-
                     android:orientation="vertical">
 
                     <ImageView
@@ -53,24 +52,26 @@
                 </LinearLayout>
 
                 <EditText
+                    android:id="@+id/edtDepan"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_margin="20dp"
                     android:background="@drawable/round_edittext"
                     android:hint="@string/nama_depan"
-                    android:inputType="textCapWords"
+                    android:inputType="text|textCapCharacters"
                     android:paddingStart="@dimen/fab_margin"
                     android:paddingLeft="@dimen/fab_margin"
                     android:textColorHint="@color/colorPrimary"
                     tools:ignore="Autofill,LabelFor,RtlSymmetry" />
 
                 <EditText
+                    android:id="@+id/edtBelakang"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_margin="20dp"
                     android:background="@drawable/round_edittext"
                     android:hint="@string/nama_belakang"
-                    android:inputType="textCapWords"
+                    android:inputType="text|textCapCharacters"
                     android:paddingStart="@dimen/fab_margin"
                     android:paddingLeft="@dimen/fab_margin"
                     tools:ignore="Autofill,LabelFor,RtlSymmetry" />
@@ -91,8 +92,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/round_bg"
-            android:text="Berikutnya"
-            android:onClick="goIdentitas"/>
+            android:onClick="goRegistEmail"
+            android:text="Berikutnya" />
 
     </RelativeLayout>
 </RelativeLayout>

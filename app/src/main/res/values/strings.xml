@@ -6,7 +6,7 @@
     <string name="regitrasi">Registrasi</string>
     <string name="masuk">MASUK</string>
     <string name="npm_1235xxxxx">NPM (1235xxxxx)</string>
-    <string name="email">Email (name@gmail.com)</string>
+    <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="confrim_password">Confrim Password</string>
     <string name="no_hp_0812xxxxxxxx">No.Hp (812xxxxxxxx)</string>
@@ -47,5 +47,79 @@
     <string name="nama_belakang">Nama Belakang</string>
     <string name="nama_depan">Nama Depan</string>
     <string name="masukan_nama_anda">Masukan Nama Anda</string>
+    <string name="note">Data harus sama dengan yang ada di KTM anda! Jika tidak Anda diwajibkan menginputkan Identitas KTM ini kembali!</string>
+
+    <string-array name="fakultas">
+        <item>1.Fakultas Hukum</item>
+        <item>2.Fakultas Agama Islam</item>
+        <item>3.Fakultas Teknik</item>
+        <item>4.Fakultas Pertanian</item>
+        <item>5.Fakultas Ekonomi</item>
+        <item>6.Fakultas Ilmu Keguruan dan Pendidikan</item>
+        <item>7.Fakultas Ilmu Sosial dan Politik</item>
+        <item>8.Fakultas Psikologi</item>
+        <item>9.Fakultas Ilmu Komunikasi</item>
+    </string-array>
+
+    <string-array name="hukum">
+        <item>1.Ilmu Hukum</item>
+    </string-array>
+
+    <string-array name="agamaislam">
+        <item>1.Pendidikan Agama Islam</item>
+        <item>2.Ekonomi Islam (Syariah)</item>
+        <item>3.Pendidikan Islam Anak Usia dini (PIAUD)</item>
+        <item>4.Perbankan Syariah</item>
+        <item>5.Pendidikan Bahasa Arab</item>
+    </string-array>
+
+    <string-array name="teknik">
+        <item>1.Teknik Sipil</item>
+        <item>2.Teknik Perminyakan</item>
+        <item>3.Teknik Mesin</item>
+        <item>4.Planologi</item>
+        <item>5.Teknik Informatika</item>
+        <item>6.Teknik Geologi</item>
+    </string-array>
+
+    <string-array name="pertanian">
+        <item>1.Agroteknologi</item>
+    </string-array>
+
+    <string-array name="ekonomi">
+        <item>1.Ekonomi Pembangunan</item>
+        <item>2.Manajemen</item>
+        <item>3.Akuntansi</item>
+    </string-array>
+
+    <string-array name="fkip">
+        <item>1.Pendidikan Bahasa Inggris</item>
+        <item>2.Pendidikan Bahasa Indonesia</item>
+        <item>3.Pendidikan Matematika</item>
+        <item>4.Pendidikan Biologi</item>
+        <item>5.Pendidikan Jaskerek</item>
+        <item>6.Pendidikan Sendratasik</item>
+        <item>7.Pendidikan Akuntansi</item>
+        <item>8.PGSD</item>
+        <item>9.Pendidikan Kimia</item>
+    </string-array>
+
+    <string-array name="isp">
+        <item>1.Ilmu Pemerintahan</item>
+        <item>2.Kriminologi</item>
+        <item>3.Administrasi Publik</item>
+        <item>4.Administrasi Bisnis</item>
+        <item>5.Administrasi Perkantoran</item>
+        <item>6.Hubungan Internasional</item>
+    </string-array>
+
+    <string-array name="psikologi">
+        <item>1.Ilmu Pemerintahan</item>
+    </string-array>
+
+    <string-array name="komunikasi">
+        <item>1.Ilmu Komunikasi</item>
+    </string-array>
+
 
 </resources>
