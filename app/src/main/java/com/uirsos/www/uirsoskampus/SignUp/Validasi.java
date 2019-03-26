@@ -1,12 +1,15 @@
 package com.uirsos.www.uirsoskampus.SignUp;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.icu.util.Calendar;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -15,14 +18,27 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.uirsos.www.uirsoskampus.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Validasi extends AppCompatActivity implements View.OnClickListener {
 
@@ -31,12 +47,19 @@ public class Validasi extends AppCompatActivity implements View.OnClickListener 
     private TextView huruffakultas, hurufprodi, nmLengkap;
     private EditText digit;
     private ImageView image_ktm;
+    private String user_id;
+    private ProgressBar progresValid;
 
     ArrayList<String> listTahun = new ArrayList<String>();
     ArrayAdapter<String> itemTahun;
     String thn, nama;
 
-    private Uri mainImageURI = null;
+    private Uri gambarKTM = null;
+
+    /*Firebase*/
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+    private StorageReference storage = FirebaseStorage.getInstance().getReference();
 
     @SuppressLint("NewApi")
     @Override
@@ -64,6 +87,7 @@ public class Validasi extends AppCompatActivity implements View.OnClickListener 
         tahunAngkatan = findViewById(R.id.spinner);
         fakultas = findViewById(R.id.spinnerFakultas);
         prodi = findViewById(R.id.spinnerProdi);
+        progresValid = findViewById(R.id.progresValidasi);
 
         /*nilai yang akan diambil*/
         textViewTA = findViewById(R.id.textTahunAngkatan);
@@ -93,8 +117,8 @@ public class Validasi extends AppCompatActivity implements View.OnClickListener 
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
 
-                mainImageURI = result.getUri();
-                image_ktm.setImageURI(mainImageURI);
+                gambarKTM = result.getUri();
+                image_ktm.setImageURI(gambarKTM);
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
 
@@ -440,9 +464,10 @@ public class Validasi extends AppCompatActivity implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
+        progresValid.setVisibility(View.VISIBLE);
         int JP = 1;
         String digit1 = digit.getText().toString();
-        String namaLengkap = nmLengkap.getText().toString().trim().toUpperCase();
+        final String namaLengkap = nmLengkap.getText().toString().trim().toUpperCase();
 
         /*Nilai Tahun Angkatan*/
         String tahun = textViewTA.getText().toString();
@@ -450,19 +475,45 @@ public class Validasi extends AppCompatActivity implements View.OnClickListener 
 
         /*value Fakultas*/
         String angkafak = angkafakultas.getText().toString();
-        String huruffak = huruffakultas.getText().toString();
+        final String huruffak = huruffakultas.getText().toString();
 
         /*Value Prodi*/
         String angkapro = angkaprodi.getText().toString();
-        String hurufPro = hurufprodi.getText().toString();
+        final String hurufPro = hurufprodi.getText().toString();
+        final String NPM = pisahTA + angkafak + angkapro + JP + digit1;
+
         if (digit1.equals("") || digit1.length() != 4) {
+            progresValid.setVisibility(View.GONE);
             Toast.makeText(this, "periksa angka npm anda", Toast.LENGTH_SHORT).show();
             digit.setError("Periksa angka NPM Anda!");
         } else {
-            if (mainImageURI != null) {
-                validasiAkun();
-//                String NPM = pisahTA + angkafak + angkapro + JP + digit1;
-//                Toast.makeText(this, "NPM " + NPM + "Nama " + namaLengkap + " Fakultas = " + huruffak + "Prodi = " + mainImageURI, Toast.LENGTH_SHORT).show();
+            if (gambarKTM != null) {
+                user_id = mAuth.getCurrentUser().getUid();
+
+                final StorageReference imageKtm = storage.child("gambar_ktm").child(user_id + ".jpg");
+                UploadTask uploadTask = imageKtm.putFile(gambarKTM);
+                Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                    @Override
+                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+
+                        return imageKtm.getDownloadUrl();
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            Toast.makeText(Validasi.this, "" + downloadUri, Toast.LENGTH_SHORT).show();
+
+                            validasiAkun(downloadUri, NPM, namaLengkap, huruffak, hurufPro);
+                        } else {
+                            Toast.makeText(Validasi.this, "Error!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             } else {
                 Toast.makeText(this, "Silakan masukan gambar KTM Anda!", Toast.LENGTH_SHORT).show();
             }
@@ -471,6 +522,54 @@ public class Validasi extends AppCompatActivity implements View.OnClickListener 
 
     }
 
-    private void validasiAkun() {
+    private void validasiAkun(Uri task, String NPM, String namaLengkap, String huruffak, String hurufPro) {
+
+
+        String level = "mahasiswa";
+        Map<String, String> userMap = new HashMap<>();
+        userMap.put("NPM", NPM);
+        userMap.put("Nama Lengkap", namaLengkap);
+        userMap.put("Fakultas", huruffak);
+        userMap.put("Prodi", hurufPro);
+        userMap.put("Level", level);
+
+        final Map<String, String> validasiMap = new HashMap<>();
+        validasiMap.put("NPM", NPM);
+        validasiMap.put("Nama Lengkap", namaLengkap);
+        validasiMap.put("Fakultas", huruffak);
+        validasiMap.put("Prodi", hurufPro);
+        validasiMap.put("imageKtm", String.valueOf(task));
+
+        firestore.collection("User").document(user_id).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+
+                    firestore.collection("Validasi").document(user_id).set(validasiMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                AlertDialog.Builder alert = new AlertDialog.Builder(Validasi.this);
+                                alert.setTitle("Register Berhasil");
+                                alert.setMessage("Silakan login kembali")
+                                        .setCancelable(false)
+                                        .setPositiveButton("Login", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                progresValid.setVisibility(View.GONE);
+                                                Intent login = new Intent(Validasi.this, WelcomeLogin.class);
+                                                startActivity(login);
+                                                mAuth.signOut();
+                                                finish();
+                                            }
+                                        }).show();
+                                Toast.makeText(Validasi.this, "Validasi Terkirim", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
     }
 }

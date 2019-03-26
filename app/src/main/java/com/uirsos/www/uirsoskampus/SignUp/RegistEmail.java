@@ -1,7 +1,9 @@
 package com.uirsos.www.uirsoskampus.SignUp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -67,10 +69,7 @@ public class RegistEmail extends AppCompatActivity implements View.OnClickListen
             progressBar.setVisibility(View.GONE);
         } else {
             if (pass.equals(coPass)) {
-                Toast.makeText(this, "nama depan = " + email, Toast.LENGTH_SHORT).show();
-
                 createEmail(email, pass);
-
             } else {
                 progressBar.setVisibility(View.GONE);
                 coPassword.requestFocus();
@@ -94,8 +93,22 @@ public class RegistEmail extends AppCompatActivity implements View.OnClickListen
                             Intent validasi = new Intent(RegistEmail.this, Validasi.class);
                             validasi.putExtra("namaLengkap", namaLengkap);
                             startActivity(validasi);
+                            finish();
                         } else {
-                            Toast.makeText(RegistEmail.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
+                            AlertDialog.Builder allert = new AlertDialog.Builder(RegistEmail.this);
+                            allert.setTitle("Silakan Login");
+                            allert.setMessage("Akun telah terdaftar!");
+                            allert.setCancelable(false)
+                                    .setPositiveButton("Login", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent intent = new Intent(RegistEmail.this, WelcomeLogin.class);
+                                            startActivity(intent);
+                                            mAuth.signOut();
+                                            finish();
+                                        }
+                                    }).show();
+//                            Toast.makeText(RegistEmail.this, "Email anda sudah terdaftar! Silakan Login", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

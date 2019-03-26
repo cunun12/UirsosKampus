@@ -21,7 +21,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".SignUp.RegistEmail"></activity>
+        <activity android:name=".Profile.SettingAccount"></activity>
+        <activity android:name=".SignUp.RegistEmail" />
         <activity
             android:name=".SignUp.Validasi"
             tools:ignore="InnerclassSeparator" />

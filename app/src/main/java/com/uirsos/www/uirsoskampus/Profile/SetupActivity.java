@@ -53,6 +53,7 @@ import android.widget.TextView;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.uirsos.www.uirsoskampus.R;
+import com.uirsos.www.uirsoskampus.SignUp.WelcomeLogin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -370,6 +371,7 @@ public class SetupActivity extends AppCompatActivity {
                                 .setPositiveButton("Login", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
+//                                        Intent intent = new Intent(SetupActivity.this, WelcomeLogin.class);
                                         mAuth.signOut();
                                         finish();
                                     }
