@@ -1,26 +1,31 @@
 package com.uirsos.www.uirsoskampus.POJO;
 
-import java.util.Date;
-
 /**
  * Created by cunun12 on 05/05/2018.
  */
 
 public class Status_PostList extends PostId{
 
-    private String user_id, deskripsi, image_thumb, imagePost;
+    private String user_id, deskripsi, gambar_posting;
     private String postTime, fakultas;
 
     public Status_PostList() {
     }
 
-    public Status_PostList(String user_id, String deskripsi, String image_thumb, String imagePost, String postTime, String fakultas) {
+    public Status_PostList(String user_id, String deskripsi, String gambar_posting, String postTime, String fakultas) {
         this.user_id = user_id;
         this.deskripsi = deskripsi;
-        this.image_thumb = image_thumb;
-        this.imagePost = imagePost;
+        this.gambar_posting = gambar_posting;
         this.postTime = postTime;
         this.fakultas = fakultas;
+    }
+
+    public String getGambar_posting() {
+        return gambar_posting;
+    }
+
+    public void setGambar_posting(String gambar_posting) {
+        this.gambar_posting = gambar_posting;
     }
 
     public String getUser_id() {
@@ -37,22 +42,6 @@ public class Status_PostList extends PostId{
 
     public void setDeskripsi(String deskripsi) {
         this.deskripsi = deskripsi;
-    }
-
-    public String getImage_thumb() {
-        return image_thumb;
-    }
-
-    public void setImage_thumb(String image_thumb) {
-        this.image_thumb = image_thumb;
-    }
-
-    public String getImagePost() {
-        return imagePost;
-    }
-
-    public void setImagePost(String imagePost) {
-        this.imagePost = imagePost;
     }
 
     public String getPostTime() {

@@ -74,7 +74,7 @@ public class AdapterHistory extends RecyclerView.Adapter<AdapterHistory.HistoryH
         final String postId = listHistory.get(position).PostId;
         Log.d(TAG, "onBindViewHolder: postid" +postId);
 
-        final String imageUrl = listHistory.get(position).getImagePost();
+        final String imageUrl = listHistory.get(position).getGambar_posting();
         final String desc = listHistory.get(position).getDeskripsi();
         final String postTime = listHistory.get(position).getPostTime();
         Log.d(TAG, "onBindViewHolder: deskripsi " + desc);
@@ -87,14 +87,14 @@ public class AdapterHistory extends RecyclerView.Adapter<AdapterHistory.HistoryH
             public void onClick(final View v) {
 
 
-                firebaseFirestore.collection("users").document(userid).get()
+                firebaseFirestore.collection("User").document(userid).get()
                         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 if (task.isSuccessful()) {
 
-                                    String userNamePost = task.getResult().getString("nama_user");
-                                    String imageUser = task.getResult().getString("imagePic");
+                                    String userNamePost = task.getResult().getString("nama_lengkap");
+                                    String imageUser = task.getResult().getString("gambar_profile");
 
                                     Intent viewIntent = new Intent(v.getContext(), ViewPostActivity.class);
                                     viewIntent.putExtra("postId", postId);

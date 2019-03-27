@@ -21,7 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Profile.SettingAccount"></activity>
+        <activity android:name=".Profile.AdminProfile"/>
+        <activity android:name=".StatusInfo.AdminActivity" />
+        <activity android:name=".Profile.SettingAccount" />
         <activity android:name=".SignUp.RegistEmail" />
         <activity
             android:name=".SignUp.Validasi"

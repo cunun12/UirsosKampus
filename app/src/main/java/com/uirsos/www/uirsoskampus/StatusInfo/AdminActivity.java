@@ -6,62 +6,51 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.uirsos.www.uirsoskampus.Profile.ProfileActivity;
-import com.uirsos.www.uirsoskampus.Profile.SettingAccount;
-import com.uirsos.www.uirsoskampus.Profile.SetupActivity;
-import com.uirsos.www.uirsoskampus.R;
-import com.uirsos.www.uirsoskampus.SignUp.LoginActivity;
-import com.uirsos.www.uirsoskampus.SignUp.LoginEmail;
-import com.uirsos.www.uirsoskampus.SignUp.RegisterActivity;
-import com.uirsos.www.uirsoskampus.Utils.BottomNavigationHelper;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.uirsos.www.uirsoskampus.Profile.SettingAccount;
+import com.uirsos.www.uirsoskampus.R;
+import com.uirsos.www.uirsoskampus.SignUp.LoginEmail;
+import com.uirsos.www.uirsoskampus.Utils.BottomNavigationHelper;
 import com.uirsos.www.uirsoskampus.Utils.SectionPagerAdapter;
 
-import javax.annotation.Nullable;
-
-public class MainActivity extends AppCompatActivity {
+public class AdminActivity extends AppCompatActivity {
 
     private static final int ACTIVITY_NUM = 0;
 
-    BottomNavigationViewEx defaultBottomNav;
+    BottomNavigationViewEx adminBottomNav;
     String user_id, current_user_id;
     //firebase
     private FirebaseAuth mAuth;
     private FirebaseFirestore firebaseFirestore;
     private String TAG = "MainActivity";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_admin);
 
         mAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         user_id = mAuth.getUid();
 
-        defaultBottomNav = (BottomNavigationViewEx) findViewById(R.id.defaultBottom);
+        adminBottomNav = (BottomNavigationViewEx) findViewById(R.id.adminNavbar);
 
         setupViewPager();
 
         if (mAuth.getCurrentUser() != null) {
             setupBottomNavigation();
         }
-
-
     }
 
     /**
@@ -87,9 +76,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
         //jika level bukan admin maka menu nya cuman ada menu home dan profile
-        BottomNavigationHelper.setupBottomNavigationView(defaultBottomNav);
-        BottomNavigationHelper.enableNavigation(MainActivity.this, defaultBottomNav);
-        Menu menu = defaultBottomNav.getMenu();
+        BottomNavigationHelper.setupBottomNavigationView(adminBottomNav);
+        BottomNavigationHelper.enableNavigationAdmin(AdminActivity.this, adminBottomNav);
+        Menu menu = adminBottomNav.getMenu();
         MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
         menuItem.setChecked(true);
 
@@ -112,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         String gambar = task.getResult().getString("gambar_profile");
                         if (gambar == null) {
-                            Intent setting = new Intent(MainActivity.this, SettingAccount.class);
+                            Intent setting = new Intent(AdminActivity.this, SettingAccount.class);
                             startActivity(setting);
                             finish();
                         }
@@ -124,10 +113,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void sendToMain() {
-        Intent intentLogin = new Intent(MainActivity.this, LoginEmail.class);
+        Intent intentLogin = new Intent(AdminActivity.this, LoginEmail.class);
         startActivity(intentLogin);
         finish();
     }
-
 }

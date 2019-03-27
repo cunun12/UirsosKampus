@@ -44,7 +44,7 @@ public class DetailVerifikasi extends AppCompatActivity implements View.OnClickL
     LinearLayout bagianAdmin, bagianUser;
     CircleImageView imageUser;
     ImageView ktmImage, buttonBack;
-    TextView namaUser, textNPM, textNama, textProdi, textKomentar;
+    TextView namaUser, textNPM, textNama, textFakultas, textProdi;
     Button btnCancel, btnVerify;
     AlertDialog dialog;
     String user_id;
@@ -71,8 +71,8 @@ public class DetailVerifikasi extends AppCompatActivity implements View.OnClickL
         ktmImage = findViewById(R.id.image_KtmVerify);
         textNPM = findViewById(R.id.text_NPM);
         textNama = findViewById(R.id.text_NamaPengguna);
-        textProdi = findViewById(R.id.text_Prodi);
-        textKomentar = findViewById(R.id.text_Komentar);
+        textFakultas = findViewById(R.id.text_fakultas);
+        textProdi= findViewById(R.id.text_prodi);
         buttonBack = findViewById(R.id.backArrow);
 
         /*firebase*/
@@ -87,8 +87,8 @@ public class DetailVerifikasi extends AppCompatActivity implements View.OnClickL
         String getNPM = data.getStringExtra("npm");
         String getNama = data.getStringExtra("namaKTM");
         String getImageKTM = data.getStringExtra("imageKTM");
+        String getFakultas = data.getStringExtra("fakultas");
         String getProdi = data.getStringExtra("prodi");
-        String getKomentar = data.getStringExtra("komentar");
         getVerifyId = data.getStringExtra("verifyId");
         Log.d(TAG, "onCreate: coba check" + getVerifyId);
         listVerify = new ArrayList<>();
@@ -96,8 +96,8 @@ public class DetailVerifikasi extends AppCompatActivity implements View.OnClickL
         namaUser.setText(nama);
         textNPM.setText(getNPM);
         textNama.setText(getNama);
+        textFakultas.setText(getFakultas);
         textProdi.setText(getProdi);
-        textKomentar.setText(getKomentar);
 
         Glide.with(this)
                 .load(getImageKTM)

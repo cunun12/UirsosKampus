@@ -11,7 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -21,42 +20,48 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.uirsos.www.uirsoskampus.Adapter.AdapterHistory;
 import com.uirsos.www.uirsoskampus.POJO.Status_PostList;
 import com.uirsos.www.uirsoskampus.R;
-import com.uirsos.www.uirsoskampus.SignUp.LoginActivity;
-import com.uirsos.www.uirsoskampus.StatusInfo.MainActivity;
+import com.uirsos.www.uirsoskampus.SignUp.WelcomeLogin;
 import com.uirsos.www.uirsoskampus.Utils.BottomNavigationHelper;
 import com.uirsos.www.uirsoskampus.Utils.GridImageDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FriendActivity extends AppCompatActivity {
-
+public class AdminProfile extends AppCompatActivity {
     private static final int ACTIVITY_NUM = 1;
-    BottomNavigationViewEx defaultBottomNav, adminBottomNav;
-    String userId;
+
     //widget
+    BottomNavigationViewEx adminBottomNav;
     private CircleImageView imgProfile;
-    private TextView textNpm, textNama, textGender, textStatus, textFakultas;
+    private TextView textNpm, textNama, textGender, textFakultas;
     private RecyclerView listHistori;
     private List<Status_PostList> postHistory;
     private AdapterHistory adapterHistory;
+
     //firebase
+    String gambarProfile;
     private FirebaseAuth mAuth;
     private FirebaseFirestore firebaseFirestore;
-    private String user_id;
+    private String user_id, email;
+    private String TAG = "profileActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_admin_profile);
+
 
         Toolbar toolbar = findViewById(R.id.profileToolbar);
         setSupportActionBar(toolbar);
@@ -67,21 +72,13 @@ public class FriendActivity extends AppCompatActivity {
         textNpm = findViewById(R.id.txtNPM);
         textNama = findViewById(R.id.txtNamaPengguna);
         textGender = findViewById(R.id.txtJenisKelamin);
-//        textStatus = findViewById(R.id.txtStatusUser);
         textFakultas = findViewById(R.id.txtFakultas);
         listHistori = findViewById(R.id.historyUser);
-        defaultBottomNav = (BottomNavigationViewEx) findViewById(R.id.defaultBottom);
         adminBottomNav = (BottomNavigationViewEx) findViewById(R.id.adminNavbar);
-        adminBottomNav.setVisibility(View.GONE);
-
         //firebase
         mAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         user_id = mAuth.getCurrentUser().getUid();
-
-
-        Intent user = getIntent();
-        userId = user.getStringExtra("idUser");
 
         loadProfile();
 
@@ -97,16 +94,10 @@ public class FriendActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-    }
-
     private void loadHistory() {
 
         firebaseFirestore.collection("posting")
-                .whereEqualTo("user_id", userId)
+                .whereEqualTo("user_id", user_id)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -131,60 +122,91 @@ public class FriendActivity extends AppCompatActivity {
 
     private void loadProfile() {
 
+        firebaseFirestore.collection("User").document(user_id).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @SuppressLint("CheckResult")
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    String nama = documentSnapshot.getString("nama_lengkap");
+                    String npm = documentSnapshot.getString("NPM");
+                    String prodi = documentSnapshot.getString("Prodi");
+                    gambarProfile = documentSnapshot.getString("gambar_profile");
 
-        firebaseFirestore.collection("User").document(userId).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @SuppressLint("CheckResult")
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-
-                            String npm = task.getResult().getString("NPM");
-                            String nama = task.getResult().getString("nama_pengguna");
-//                            String gender = task.getResult().getString("jenis_kelamin");
-                            String fakultas = task.getResult().getString("Fakultas");
-                            String image = task.getResult().getString("gambar_profile");
-
-                            textNpm.setText(npm);
-                            textNama.setText(nama);
-//                            textGender.setText(gender);
-                            textFakultas.setText(fakultas);
-
-                            RequestOptions placeholderrequest = new RequestOptions();
-                            placeholderrequest.placeholder(R.drawable.defaulticon);
-                            Glide.with(getApplicationContext())
-                                    .setDefaultRequestOptions(placeholderrequest)
-                                    .load(image)
-                                    .into(imgProfile);
-
-//                            firebaseFirestore.collection("users/" + userId + "/status").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                                    for (DocumentSnapshot doc : task.getResult()) {
-//                                        String status = doc.getString("status");
-//
-//                                        textStatus.setText(status);
-//                                    }
-//                                }
-//                            });
-                        }
-                    }
-                });
+                    textNama.setText(nama);
+                    textNpm.setText(npm);
+                    textFakultas.setText(prodi);
+                    RequestOptions placeholderrequest = new RequestOptions();
+                    placeholderrequest.placeholder(R.drawable.defaulticon);
+                    Glide.with(getApplicationContext())
+                            .setDefaultRequestOptions(placeholderrequest)
+                            .load(gambarProfile)
+                            .into(imgProfile);
+                }
+            }
+        });
 
     }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 
     private void setupBottomNavigation() {
         //jika level bukan admin maka menu nya cuman ada menu home dan profile
-        adminBottomNav.setVisibility(View.GONE);
-        defaultBottomNav.setVisibility(View.VISIBLE);
-        BottomNavigationHelper.setupBottomNavigationView(defaultBottomNav);
-        BottomNavigationHelper.enableNavigation(FriendActivity.this, defaultBottomNav);
-        Menu menu = defaultBottomNav.getMenu();
+        BottomNavigationHelper.setupBottomNavigationView(adminBottomNav);
+        BottomNavigationHelper.enableNavigationAdmin(AdminProfile.this, adminBottomNav);
+        Menu menu = adminBottomNav.getMenu();
         MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
         menuItem.setChecked(true);
+
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+
+        getMenuInflater().inflate(R.menu.profile_menu, menu);
+
+        return true;
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+
+        switch (item.getItemId()) {
+            case R.id.accountSetting:
+
+                Intent setupActivity = new Intent(AdminProfile.this, SettingAccount.class);
+                setupActivity.putExtra("update", 1);
+                setupActivity.putExtra("nama", textNama.getText());
+                setupActivity.putExtra("image_profile", gambarProfile);
+                startActivity(setupActivity);
+
+                return true;
+
+            case R.id.Logout:
+
+                logout();
+
+                return true;
+
+            default:
+
+                return false;
+        }
+
+    }
+
+    private void logout() {
+
+        mAuth.signOut();
+        finish();
+        sendToLogin();
+    }
 
     @Override
     protected void onStart() {
@@ -198,8 +220,9 @@ public class FriendActivity extends AppCompatActivity {
 
     private void sendToLogin() {
 
-        Intent loginIntent = new Intent(FriendActivity.this, LoginActivity.class);
+        Intent loginIntent = new Intent(AdminProfile.this, WelcomeLogin.class);
         startActivity(loginIntent);
         finish();
     }
+
 }

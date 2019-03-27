@@ -4,22 +4,23 @@ package com.uirsos.www.uirsoskampus.POJO;
  * Created by cunun12 on 08/06/2018.
  */
 
-public class Verify extends PostId{
+public class Verify extends PostId {
 
-    String user_id, nama_pengguna, komentar, image_ktm, fakultas, npm, waktu;
+    private String user_id, NPM, nama_lengkap, Fakultas, Prodi, imageKtm, waktu;
 
     public Verify() {
     }
 
-    public Verify(String user_id, String nama_pengguna, String komentar, String image_ktm, String fakultas, String npm, String waktu) {
+    public Verify(String user_id, String NPM, String nama_lengkap, String Fakultas, String Prodi, String imageKtm, String waktu) {
         this.user_id = user_id;
-        this.nama_pengguna = nama_pengguna;
-        this.komentar = komentar;
-        this.image_ktm = image_ktm;
-        this.fakultas = fakultas;
-        this.npm = npm;
+        this.NPM = NPM;
+        this.nama_lengkap = nama_lengkap;
+        this.Fakultas = Fakultas;
+        this.Prodi = Prodi;
+        this.imageKtm = imageKtm;
         this.waktu = waktu;
     }
+
 
     public String getUser_id() {
         return user_id;
@@ -29,44 +30,44 @@ public class Verify extends PostId{
         this.user_id = user_id;
     }
 
-    public String getNama_pengguna() {
-        return nama_pengguna;
+    public String getNPM() {
+        return NPM;
     }
 
-    public void setNama_pengguna(String nama_pengguna) {
-        this.nama_pengguna = nama_pengguna;
+    public void setNPM(String NPM) {
+        this.NPM = NPM;
     }
 
-    public String getKomentar() {
-        return komentar;
+    public String getNama_lengkap() {
+        return nama_lengkap;
     }
 
-    public void setKomentar(String komentar) {
-        this.komentar = komentar;
-    }
-
-    public String getImage_ktm() {
-        return image_ktm;
-    }
-
-    public void setImage_ktm(String image_ktm) {
-        this.image_ktm = image_ktm;
+    public void setNama_lengkap(String nama_lengkap) {
+        this.nama_lengkap = nama_lengkap;
     }
 
     public String getFakultas() {
-        return fakultas;
+        return Fakultas;
     }
 
     public void setFakultas(String fakultas) {
-        this.fakultas = fakultas;
+        Fakultas = fakultas;
     }
 
-    public String getNpm() {
-        return npm;
+    public String getProdi() {
+        return Prodi;
     }
 
-    public void setNpm(String npm) {
-        this.npm = npm;
+    public void setProdi(String prodi) {
+        Prodi = prodi;
+    }
+
+    public String getImageKtm() {
+        return imageKtm;
+    }
+
+    public void setImageKtm(String imageKtm) {
+        this.imageKtm = imageKtm;
     }
 
     public String getWaktu() {

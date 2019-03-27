@@ -58,12 +58,12 @@
 
     <!--Bottom / Footer-->
     <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
-        android:id="@+id/defaultBottom"
+        android:id="@+id/adminNavbar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:background="@drawable/border_bottom"
         app:itemTextColor="@color/colorPrimaryDark"
-        app:menu="@menu/bottom_menu" />
+        app:menu="@menu/admin_menu" />
 
 </RelativeLayout>

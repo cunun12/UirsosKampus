@@ -9,8 +9,10 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.uirsos.www.uirsoskampus.Profile.AdminProfile;
 import com.uirsos.www.uirsoskampus.Profile.ProfileActivity;
 import com.uirsos.www.uirsoskampus.R;
+import com.uirsos.www.uirsoskampus.StatusInfo.AdminActivity;
 import com.uirsos.www.uirsoskampus.StatusInfo.MainActivity;
 import com.uirsos.www.uirsoskampus.Verifikasi.Verifikasi;
 
@@ -30,12 +32,47 @@ public class BottomNavigationHelper {
         bottomNavigationViewEx.setTextVisibility(true);
     }
 
+    public static void enableNavigationAdmin(final Context context, BottomNavigationViewEx view) {
+        view.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                switch (item.getItemId()) {
+
+                    case R.id.home:
+
+                        Intent intentHome = new Intent(context, AdminActivity.class); //Activity num 0
+                        intentHome.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        context.startActivity(intentHome);
+
+                        break;
+
+                    case R.id.Profile:
+
+                        Intent intentProfile = new Intent(context, AdminProfile.class); //Activity num 1
+                        intentProfile.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        context.startActivity(intentProfile);
+
+                        break;
+                    case R.id.verifikasiUser:
+                        Intent intentVerifikasi = new Intent(context, Verifikasi.class); //Activity num 2
+                        intentVerifikasi.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        context.startActivity(intentVerifikasi);
+
+                        break;
+                }
+
+                return false;
+            }
+        });
+    }
+
     public static void enableNavigation(final Context context, BottomNavigationViewEx view) {
         view.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
 
                     case R.id.home:
 
@@ -50,12 +87,6 @@ public class BottomNavigationHelper {
                         Intent intentProfile = new Intent(context, ProfileActivity.class); //Activity num 1
                         intentProfile.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         context.startActivity(intentProfile);
-
-                        break;
-                    case R.id.verifikasiUser:
-                        Intent intentVerifikasi = new Intent(context, Verifikasi.class); //Activity num 2
-                        intentVerifikasi.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        context.startActivity(intentVerifikasi);
 
                         break;
                 }

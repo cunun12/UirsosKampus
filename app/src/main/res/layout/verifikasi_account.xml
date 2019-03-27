@@ -13,7 +13,8 @@
         android:id="@+id/bagian_user"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
@@ -132,8 +133,7 @@
         android:id="@+id/bagian_admin"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="vertical">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"
@@ -247,14 +247,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Prodi = "
+                        android:text="Fakultas = "
                         android:textSize="18sp" />
 
                     <TextView
-                        android:id="@+id/text_Prodi"
+                        android:id="@+id/text_fakultas"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Prodi"
+                        android:text="Fakultas"
                         android:textSize="18sp" />
                 </LinearLayout>
 
@@ -266,14 +266,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Komentar = "
+                        android:text="Prodi = "
                         android:textSize="18sp" />
 
                     <TextView
-                        android:id="@+id/text_Komentar"
+                        android:id="@+id/text_prodi"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ingin Verifikasi"
+                        android:text="Prodi"
                         android:textSize="18sp" />
                 </LinearLayout>
 

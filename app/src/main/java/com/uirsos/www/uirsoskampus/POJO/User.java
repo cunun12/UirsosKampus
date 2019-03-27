@@ -5,29 +5,30 @@ package com.uirsos.www.uirsoskampus.POJO;
  */
 
 public class User {
-    public String imagePic, nama_user;
+    public String gambar_profile, nama_lengkap;
 
     public User() {
     }
 
-    public User(String imagePic, String nama_user) {
-        this.imagePic = imagePic;
-        this.nama_user = nama_user;
+    public User(String gambar_profile, String nama_lengkap) {
+        this.gambar_profile = gambar_profile;
+        this.nama_lengkap = nama_lengkap;
     }
 
-    public String getImagePic() {
-        return imagePic;
+    public String getGambar_profile() {
+        return gambar_profile;
     }
 
-    public void setImagePic(String imagePic) {
-        this.imagePic = imagePic;
+    public void setGambar_profile(String gambar_profile) {
+        this.gambar_profile = gambar_profile;
     }
 
-    public String getNama_user() {
-        return nama_user;
+    public String getNama_lengkap() {
+        return nama_lengkap;
     }
 
-    public void setNama_user(String nama_user) {
-        this.nama_user = nama_user;
+    public void setNama_lengkap(String nama_lengkap) {
+        this.nama_lengkap = nama_lengkap;
     }
+
 }

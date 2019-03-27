@@ -219,7 +219,7 @@ public class SetupActivity extends AppCompatActivity {
                         updateStore(task, nama);
                     }
                 }
-            });
+    });
 
         } else {
             updateStore(null, nama);

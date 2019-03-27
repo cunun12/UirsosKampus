@@ -70,15 +70,16 @@ public class AdapaterVerify extends RecyclerView.Adapter<AdapaterVerify.HolderVe
 
         holder.setIsRecyclable(false);
 
-        final String image = listUser.get(position).getImagePic();
-        final String namaPengguna = listUser.get(position).getNama_user();
+        final String image = listUser.get(position).getGambar_profile();
+        final String namaPengguna = listUser.get(position).getNama_lengkap();
         holder.setDataUser(namaPengguna, image);
 
-        final String textVerify = listVerify.get(position).getKomentar();
-        final String NPM = listVerify.get(position).getNpm();
-        final String NamaKTM = listVerify.get(position).getNama_pengguna();
-        final String imageKtm = listVerify.get(position).getImage_ktm();
+        final String NPM = listVerify.get(position).getNPM();
+        final String NamaKTM = listVerify.get(position).getNama_lengkap();
+        final String imageKtm = listVerify.get(position).getImageKtm();
         final String fakultas = listVerify.get(position).getFakultas();
+        final String prodi = listVerify.get(position).getProdi();
+        holder.setFakultas(fakultas);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.ENGLISH);
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
@@ -136,9 +137,9 @@ public class AdapaterVerify extends RecyclerView.Adapter<AdapaterVerify.HolderVe
                 detail.putExtra("imageKTM", imageKtm);
                 detail.putExtra("nama", namaPengguna);
                 detail.putExtra("namaKTM", NamaKTM);
+                detail.putExtra("fakultas", fakultas);
+                detail.putExtra("prodi", prodi);
                 detail.putExtra("waktu", timeVerify);
-                detail.putExtra("prodi", fakultas);
-                detail.putExtra("komentar", textVerify);
                 detail.putExtra("verifyId", verifyId);
                 view.getContext().startActivity(detail);
             }
@@ -154,7 +155,7 @@ public class AdapaterVerify extends RecyclerView.Adapter<AdapaterVerify.HolderVe
     class HolderVerify extends RecyclerView.ViewHolder {
 
         private View mView;
-        private TextView textNamaPengguna, textTime;
+        private TextView textNamaPengguna, textTime, textfakultas;
         private CircleImageView imgPic;
         private RelativeLayout rlList;
 
@@ -169,6 +170,12 @@ public class AdapaterVerify extends RecyclerView.Adapter<AdapaterVerify.HolderVe
             textTime = mView.findViewById(R.id.waktu_permintaan);
             textTime.setText(waktu);
         }
+
+        public void setFakultas(String fakultas){
+            textfakultas = mView.findViewById(R.id.textFakultas);
+            textfakultas.setText(fakultas);
+        }
+
 
         public void setDataUser(String nama, String image) {
             textNamaPengguna = mView.findViewById(R.id.nama_PenggunaVerify);

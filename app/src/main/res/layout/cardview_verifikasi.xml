@@ -40,10 +40,10 @@
                         android:textSize="18sp"/>
 
                     <TextView
-                        android:id="@+id/message_Verify"
+                        android:id="@+id/textFakultas"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="textKomentar"
+                        android:text="Fakultas"
                         android:textSize="16sp"/>
                 </LinearLayout>
 

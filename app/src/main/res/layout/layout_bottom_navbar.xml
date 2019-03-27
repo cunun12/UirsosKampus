@@ -23,6 +23,7 @@
             android:layout_alignParentBottom="true"
             android:background="@drawable/border_bottom"
             app:itemTextColor="@color/colorPrimaryDark"
+            android:visibility="gone"
             app:menu="@menu/admin_menu" />
     </RelativeLayout>
 </merge>

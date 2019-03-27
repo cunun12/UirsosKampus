@@ -65,7 +65,7 @@ public class AdapterKomentar extends RecyclerView.Adapter<AdapterKomentar.ViewKo
         String komentarUserId = listKomentar.get(position).getUser_id();
         Log.d(TAG, "onBindViewHolder: komentar" + komentarUserId);
 
-        firebaseFirestore.collection("users").document(komentarUserId)
+        firebaseFirestore.collection("User").document(komentarUserId)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
@@ -73,8 +73,8 @@ public class AdapterKomentar extends RecyclerView.Adapter<AdapterKomentar.ViewKo
 
                         User user = documentSnapshot.toObject(User.class);
                         assert user != null;
-                        String username = user.getNama_user();
-                        String image = user.getImagePic();
+                        String username = user.getNama_lengkap();
+                        String image = user.getGambar_profile();
                         holder.setUser(username, image);
                     }
                 });

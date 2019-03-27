@@ -104,7 +104,7 @@ public class StatusFragment extends Fragment {
 
         if (firebaseAuth.getCurrentUser() != null) {
 
-            firebaseFirestore.collection("users").document(users_id)
+            firebaseFirestore.collection("User").document(users_id)
                     .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                         @Override
                         public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
@@ -116,7 +116,7 @@ public class StatusFragment extends Fragment {
 
                             if (documentSnapshot != null && documentSnapshot.exists()) {
 
-                                fakultas_users = documentSnapshot.getString("fakultas");
+                                fakultas_users = documentSnapshot.getString("Fakultas");
 //                                Log.d(TAG, "ko fakultas : " + fakultas_users);
                                 dataView();
 
@@ -139,7 +139,7 @@ public class StatusFragment extends Fragment {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                Boolean rechadBottom = !recyclerView.canScrollVertically(1);
+                boolean rechadBottom = !recyclerView.canScrollVertically(1);
 
                 if (rechadBottom) {
                     if (firebaseAuth.getCurrentUser() != null) {

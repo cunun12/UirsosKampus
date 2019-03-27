@@ -87,7 +87,7 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
         String desc_data = postLists.get(position).getDeskripsi();
         holder.setDescText(desc_data);
 
-        String imageUrl = postLists.get(position).getImagePost();
+        String imageUrl = postLists.get(position).getGambar_posting();
         holder.setPostImage(imageUrl);
 
         final String user_id = postLists.get(position).getUser_id();
@@ -95,7 +95,7 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
         assert currentUserId != null;
 
         /*untuk mengambil profile dan nama*/
-        firebaseFirestore.collection("users").document(user_id)
+        firebaseFirestore.collection("User").document(user_id)
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @SuppressLint("CheckResult")
                     @Override
@@ -110,8 +110,8 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
                             User user = documentSnapshot.toObject(User.class);
 
                             assert user != null;
-                            String userName = user.getNama_user();
-                            String userImage = user.getImagePic();
+                            String userName = user.getNama_lengkap();
+                            String userImage = user.getGambar_profile();
                             holder.setUserData(userName, userImage);
                         } else {
                             Log.d(TAG, "onEvent: Data Null");

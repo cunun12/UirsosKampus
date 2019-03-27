@@ -28,6 +28,7 @@ import com.uirsos.www.uirsoskampus.POJO.User;
 import com.uirsos.www.uirsoskampus.POJO.Verify;
 import com.uirsos.www.uirsoskampus.R;
 import com.uirsos.www.uirsoskampus.SignUp.LoginActivity;
+import com.uirsos.www.uirsoskampus.StatusInfo.AdminActivity;
 import com.uirsos.www.uirsoskampus.Utils.BottomNavigationHelper;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class Verifikasi extends AppCompatActivity {
 
     private static final int ACTIVITY_NUM = 2;
     private static final String TAG = "Verifikasi";
-    BottomNavigationViewEx defaultBottomNav, adminBottomNav;
+    BottomNavigationViewEx adminBottomNav;
     String user_id;
     RecyclerView verifyRv;
     List<Verify> listVerify;
@@ -63,9 +64,7 @@ public class Verifikasi extends AppCompatActivity {
         firebaseFirestore = FirebaseFirestore.getInstance();
         user_id = mAuth.getCurrentUser().getUid();
 
-        defaultBottomNav = (BottomNavigationViewEx) findViewById(R.id.defaultBottom);
         adminBottomNav = (BottomNavigationViewEx) findViewById(R.id.adminNavbar);
-        adminBottomNav.setVisibility(View.GONE);
         verifyRv = findViewById(R.id.rvVerifikasi);
 
         listVerify = new ArrayList<>();
@@ -85,7 +84,7 @@ public class Verifikasi extends AppCompatActivity {
 
     private void viewVerifikasi() {
 
-        firebaseFirestore.collection("verifikasi").orderBy("waktu", Query.Direction.DESCENDING)
+        firebaseFirestore.collection("Validasi").orderBy("waktu", Query.Direction.DESCENDING)
                 .addSnapshotListener(this, new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot documentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -109,7 +108,7 @@ public class Verifikasi extends AppCompatActivity {
                                     final Verify verify = doc.getDocument().toObject(Verify.class).withId(verifyId);
 
                                     String user_id = doc.getDocument().getId();
-                                    firebaseFirestore.collection("users").document(user_id)
+                                    firebaseFirestore.collection("User").document(user_id)
                                             .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                         @Override
                                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -142,10 +141,9 @@ public class Verifikasi extends AppCompatActivity {
 
     private void setupBottomNavigation() {
 
-        defaultBottomNav.setVisibility(View.GONE);
-        adminBottomNav.setVisibility(View.VISIBLE);
+        //jika level bukan admin maka menu nya cuman ada menu home dan profile
         BottomNavigationHelper.setupBottomNavigationView(adminBottomNav);
-        BottomNavigationHelper.enableNavigation(Verifikasi.this, adminBottomNav);
+        BottomNavigationHelper.enableNavigationAdmin(Verifikasi.this, adminBottomNav);
         Menu menu = adminBottomNav.getMenu();
         MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
         menuItem.setChecked(true);

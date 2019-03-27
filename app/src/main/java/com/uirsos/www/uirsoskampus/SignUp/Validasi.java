@@ -36,9 +36,13 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.uirsos.www.uirsoskampus.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class Validasi extends AppCompatActivity implements View.OnClickListener {
 
@@ -528,16 +532,17 @@ public class Validasi extends AppCompatActivity implements View.OnClickListener 
         String level = "mahasiswa";
         Map<String, String> userMap = new HashMap<>();
         userMap.put("NPM", NPM);
-        userMap.put("Nama Lengkap", namaLengkap);
+        userMap.put("nama_lengkap", namaLengkap);
         userMap.put("Fakultas", huruffak);
         userMap.put("Prodi", hurufPro);
         userMap.put("Level", level);
 
         final Map<String, String> validasiMap = new HashMap<>();
         validasiMap.put("NPM", NPM);
-        validasiMap.put("Nama Lengkap", namaLengkap);
+        validasiMap.put("nama_lengkap", namaLengkap);
         validasiMap.put("Fakultas", huruffak);
         validasiMap.put("Prodi", hurufPro);
+        validasiMap.put("waktu", getTimestamp());
         validasiMap.put("imageKtm", String.valueOf(task));
 
         firestore.collection("User").document(user_id).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -571,5 +576,11 @@ public class Validasi extends AppCompatActivity implements View.OnClickListener 
             }
         });
 
+    }
+
+    private String getTimestamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
+        return sdf.format(new Date());
     }
 }
