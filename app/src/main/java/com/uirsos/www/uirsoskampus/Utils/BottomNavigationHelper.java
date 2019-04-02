@@ -59,6 +59,7 @@ public class BottomNavigationHelper {
                         intentVerifikasi.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         context.startActivity(intentVerifikasi);
 
+
                         break;
                 }
 

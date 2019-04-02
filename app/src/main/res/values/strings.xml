@@ -49,6 +49,8 @@
     <string name="masukan_nama_anda">Masukan Nama Anda</string>
     <string name="note">Data harus sama dengan yang ada di KTM anda! Jika tidak Anda diwajibkan menginputkan Identitas KTM ini kembali!</string>
     <string name="studentmail">\@student.uir.ac.id</string>
+    <string name="infovalidasi">Maaf akun anda di Non-Aktifkan! Karena data yang anda kirimkan tidak sesuai dengan yang ada di KTM!</string>
+    <string name="imagedekan">Gambar Berita dari Dekan</string>
 
     <string-array name="fakultas">
         <item>1.Fakultas Hukum</item>

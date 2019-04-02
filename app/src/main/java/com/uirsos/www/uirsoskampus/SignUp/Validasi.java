@@ -12,6 +12,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,13 +29,18 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.uirsos.www.uirsoskampus.R;
+import com.uirsos.www.uirsoskampus.StatusInfo.MainActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,19 +50,22 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-public class Validasi extends AppCompatActivity implements View.OnClickListener {
+import javax.annotation.Nullable;
+
+public class Validasi extends AppCompatActivity {
 
     private Spinner tahunAngkatan, fakultas, prodi;
-    private TextView textViewTA, angkafakultas, angkaprodi;
+    private TextView textViewTA, angkafakultas, angkaprodi, validasiWarning;
     private TextView huruffakultas, hurufprodi, nmLengkap;
     private EditText digit;
     private ImageView image_ktm;
-    private String user_id;
+    private String user_id, getEmail;
     private ProgressBar progresValid;
 
     ArrayList<String> listTahun = new ArrayList<String>();
     ArrayAdapter<String> itemTahun;
-    String thn, nama;
+    String thn, nama, namaPengguna, email;
+
 
     private Uri gambarKTM = null;
 
@@ -85,7 +94,7 @@ public class Validasi extends AppCompatActivity implements View.OnClickListener 
         });
 
         /*Button Regist*/
-        Button validasi = findViewById(R.id.btnValidasi);
+        final Button validasi = findViewById(R.id.btnValidasi);
 
         /*var spinner*/
         tahunAngkatan = findViewById(R.id.spinner);
@@ -101,16 +110,189 @@ public class Validasi extends AppCompatActivity implements View.OnClickListener 
         hurufprodi = findViewById(R.id.hurufProdi);
         digit = findViewById(R.id.npmDigit);
         nmLengkap = findViewById(R.id.namaLengkap);
+        validasiWarning = findViewById(R.id.validasi_warning);
 
         /*Ambil Data nama dari Regist Pertema*/
         Intent data = getIntent();
+        final int kirim = data.getIntExtra("valid", 0);
         nama = data.getStringExtra("namaLengkap");
-        nmLengkap.setText(nama);
+        getEmail = data.getStringExtra("email");
+        Log.d("validasi", "onCreate: " + data);
+
+        if (kirim == 1) {
+            validasi.setText("Kirim Ulang");
+            validasiWarning.setVisibility(View.VISIBLE);
+            user_id = mAuth.getCurrentUser().getUid();
+            email = mAuth.getCurrentUser().getEmail();
+            firestore.collection("User").document(user_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if (documentSnapshot.exists()) {
+                        namaPengguna = documentSnapshot.getString("nama_lengkap");
+                    }
+                }
+            });
+        }
+
+        /*Ambil data dari firebase*/
 
         /*Bagian Spinner*/
         setSpinnerTA();
         setSpinnerFakultas();
-        validasi.setOnClickListener(Validasi.this);
+//        validasi.setOnClickListener(Validasi.this);
+        validasi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (kirim == 1) {
+                    Toast.makeText(Validasi.this, "Kirim Ulang" + email + " " + namaPengguna, Toast.LENGTH_SHORT).show();
+                    kirimUlang();
+                } else {
+                    Toast.makeText(Validasi.this, "Kirim Validasi = " + nama + "email = " + getEmail, Toast.LENGTH_SHORT).show();
+
+                    kirimValidasi();
+                }
+            }
+        });
+    }
+
+    private void kirimValidasi() {
+        progresValid.setVisibility(View.VISIBLE);
+        int JP = 1;
+        String digit1 = digit.getText().toString();
+
+        /*Nilai Tahun Angkatan*/
+        String tahun = textViewTA.getText().toString();
+        String pisahTA = tahun.substring(2, 4);
+
+        /*value Fakultas*/
+        String angkafak = angkafakultas.getText().toString();
+        final String huruffak = huruffakultas.getText().toString();
+
+        /*Value Prodi*/
+        String angkapro = angkaprodi.getText().toString();
+        final String hurufPro = hurufprodi.getText().toString();
+        final String NPM = pisahTA + angkafak + angkapro + JP + digit1;
+
+        if (digit1.equals("") || digit1.length() != 4) {
+            progresValid.setVisibility(View.GONE);
+            Toast.makeText(this, "periksa angka npm anda", Toast.LENGTH_SHORT).show();
+            digit.setError("Periksa angka NPM Anda!");
+        } else {
+            if (gambarKTM != null) {
+                String user_id = mAuth.getCurrentUser().getUid();
+
+                final StorageReference imageKtm = storage.child("gambar_ktm").child(user_id + ".jpg");
+                UploadTask uploadTask = imageKtm.putFile(gambarKTM);
+                Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                    @Override
+                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+
+                        return imageKtm.getDownloadUrl();
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            Toast.makeText(Validasi.this, "" + downloadUri, Toast.LENGTH_SHORT).show();
+
+                            validasiAkun(downloadUri, NPM, nama, huruffak, hurufPro);
+                        } else {
+                            Toast.makeText(Validasi.this, "Error!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            } else {
+                Toast.makeText(this, "Silakan masukan gambar KTM Anda!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+
+    }
+
+    private void kirimUlang() {
+
+        progresValid.setVisibility(View.VISIBLE);
+        int JP = 1;
+        String digit1 = digit.getText().toString();
+
+        /*Nilai Tahun Angkatan*/
+        String tahun = textViewTA.getText().toString();
+        String pisahTA = tahun.substring(2, 4);
+
+        /*value Fakultas*/
+        String angkafak = angkafakultas.getText().toString();
+        final String huruffak = huruffakultas.getText().toString();
+
+        /*Value Prodi*/
+        String angkapro = angkaprodi.getText().toString();
+        final String hurufPro = hurufprodi.getText().toString();
+        final String NPM = pisahTA + angkafak + angkapro + JP + digit1;
+
+        if (digit1.equals("") || digit1.length() != 4) {
+            progresValid.setVisibility(View.GONE);
+            Toast.makeText(this, "periksa angka npm anda", Toast.LENGTH_SHORT).show();
+            digit.setError("Periksa angka NPM Anda!");
+        } else {
+            if (gambarKTM != null) {
+
+                String currentId = mAuth.getCurrentUser().getUid();
+                final StorageReference imageKtm = storage.child("gambar_ktm").child(currentId + ".jpg");
+                UploadTask uploadTask = imageKtm.putFile(gambarKTM);
+                Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                    @Override
+                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+
+                        return imageKtm.getDownloadUrl();
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            Toast.makeText(Validasi.this, "" + downloadUri, Toast.LENGTH_SHORT).show();
+
+                            lanjutKirim(downloadUri, NPM, namaPengguna, huruffak, hurufPro);
+                        } else {
+                            Toast.makeText(Validasi.this, "Error!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            } else {
+                Toast.makeText(this, "Silakan masukan gambar KTM Anda!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+    private void lanjutKirim(Uri downloadUri, String npm, String namaLengkap, String huruffak, String hurufPro) {
+        final Map<String, String> validasiMap = new HashMap<>();
+        validasiMap.put("NPM", npm);
+        validasiMap.put("nama_lengkap", namaLengkap);
+        validasiMap.put("Fakultas", huruffak);
+        validasiMap.put("Prodi", hurufPro);
+        validasiMap.put("waktu", getTimestamp());
+        validasiMap.put("imageKtm", String.valueOf(downloadUri));
+
+        firestore.collection("Validasi").document(user_id).set(validasiMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+
+                    progresValid.setVisibility(View.GONE);
+                    Intent login = new Intent(Validasi.this, MainActivity.class);
+                    startActivity(login);
+                    finish();
+                    Toast.makeText(Validasi.this, "Validasi Terkirim", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
@@ -466,72 +648,13 @@ public class Validasi extends AppCompatActivity implements View.OnClickListener 
         });
     }
 
-    @Override
-    public void onClick(View v) {
-        progresValid.setVisibility(View.VISIBLE);
-        int JP = 1;
-        String digit1 = digit.getText().toString();
-        final String namaLengkap = nmLengkap.getText().toString().trim().toUpperCase();
-
-        /*Nilai Tahun Angkatan*/
-        String tahun = textViewTA.getText().toString();
-        String pisahTA = tahun.substring(2, 4);
-
-        /*value Fakultas*/
-        String angkafak = angkafakultas.getText().toString();
-        final String huruffak = huruffakultas.getText().toString();
-
-        /*Value Prodi*/
-        String angkapro = angkaprodi.getText().toString();
-        final String hurufPro = hurufprodi.getText().toString();
-        final String NPM = pisahTA + angkafak + angkapro + JP + digit1;
-
-        if (digit1.equals("") || digit1.length() != 4) {
-            progresValid.setVisibility(View.GONE);
-            Toast.makeText(this, "periksa angka npm anda", Toast.LENGTH_SHORT).show();
-            digit.setError("Periksa angka NPM Anda!");
-        } else {
-            if (gambarKTM != null) {
-                user_id = mAuth.getCurrentUser().getUid();
-
-                final StorageReference imageKtm = storage.child("gambar_ktm").child(user_id + ".jpg");
-                UploadTask uploadTask = imageKtm.putFile(gambarKTM);
-                Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                    @Override
-                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                        if (!task.isSuccessful()) {
-                            throw task.getException();
-                        }
-
-                        return imageKtm.getDownloadUrl();
-                    }
-                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
-                        if (task.isSuccessful()) {
-                            Uri downloadUri = task.getResult();
-                            Toast.makeText(Validasi.this, "" + downloadUri, Toast.LENGTH_SHORT).show();
-
-                            validasiAkun(downloadUri, NPM, namaLengkap, huruffak, hurufPro);
-                        } else {
-                            Toast.makeText(Validasi.this, "Error!", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            } else {
-                Toast.makeText(this, "Silakan masukan gambar KTM Anda!", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-
-    }
 
     private void validasiAkun(Uri task, String NPM, String namaLengkap, String huruffak, String hurufPro) {
-
 
         String level = "mahasiswa";
         Map<String, String> userMap = new HashMap<>();
         userMap.put("NPM", NPM);
+        userMap.put("email", getEmail);
         userMap.put("nama_lengkap", namaLengkap);
         userMap.put("Fakultas", huruffak);
         userMap.put("Prodi", hurufPro);
@@ -562,9 +685,9 @@ public class Validasi extends AppCompatActivity implements View.OnClickListener 
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 progresValid.setVisibility(View.GONE);
+                                                mAuth.signOut();
                                                 Intent login = new Intent(Validasi.this, WelcomeLogin.class);
                                                 startActivity(login);
-                                                mAuth.signOut();
                                                 finish();
                                             }
                                         }).show();

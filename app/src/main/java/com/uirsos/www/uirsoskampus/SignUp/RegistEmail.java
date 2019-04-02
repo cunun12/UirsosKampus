@@ -79,7 +79,7 @@ public class RegistEmail extends AppCompatActivity implements View.OnClickListen
 
     }
 
-    private void createEmail(String email, String password) {
+    private void createEmail(final String email, String password) {
 
         Log.w("", "createEmail: " + email);
 
@@ -92,6 +92,7 @@ public class RegistEmail extends AppCompatActivity implements View.OnClickListen
 
                             Intent validasi = new Intent(RegistEmail.this, Validasi.class);
                             validasi.putExtra("namaLengkap", namaLengkap);
+                            validasi.putExtra("email", email);
                             startActivity(validasi);
                             finish();
                         } else {

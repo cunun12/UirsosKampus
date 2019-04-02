@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -28,6 +29,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+import com.uirsos.www.uirsoskampus.SignUp.Validasi;
+import com.uirsos.www.uirsoskampus.SignUp.WelcomeLogin;
 import com.uirsos.www.uirsoskampus.StatusInfo.AdminActivity;
 import com.uirsos.www.uirsoskampus.R;
 import com.uirsos.www.uirsoskampus.StatusInfo.MainActivity;
@@ -44,6 +47,7 @@ public class SettingAccount extends AppCompatActivity implements View.OnClickLis
     private EditText namaPengguna;
     private CircleImageView imageProfile;
     private String id_user;
+    private boolean isChange = false;
 
     /*firebase*/
     private FirebaseAuth mAuth;
@@ -69,9 +73,9 @@ public class SettingAccount extends AppCompatActivity implements View.OnClickLis
 
         Intent datauser = getIntent();
         final int update = datauser.getIntExtra("update", 0);
-
         if (update == 1) {
             btnSimpan.setText("Change");
+            btnSimpan.setEnabled(true);
         }
 
         logout.setOnClickListener(new View.OnClickListener() {
@@ -120,6 +124,7 @@ public class SettingAccount extends AppCompatActivity implements View.OnClickLis
                 } else {
                     tambahData();
                 }
+
             }
         });
         imageProfile.setOnClickListener(this);
@@ -152,7 +157,7 @@ public class SettingAccount extends AppCompatActivity implements View.OnClickLis
                 }
             });
         } else {
-            UpdateProfile(Uri.parse(imageUri), namaLengkap);
+            tambahProfile(Uri.parse(imageUri), namaLengkap);
         }
     }
 
@@ -166,7 +171,9 @@ public class SettingAccount extends AppCompatActivity implements View.OnClickLis
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
 
-                    pilihMenu();
+                    Intent mainActivity = new Intent(SettingAccount.this, MainActivity.class);
+                    startActivity(mainActivity);
+                    finish();
 
                 } else {
                     Toast.makeText(SettingAccount.this, "Ada kesalahan!", Toast.LENGTH_SHORT).show();
@@ -174,13 +181,14 @@ public class SettingAccount extends AppCompatActivity implements View.OnClickLis
             }
         });
     }
+
     /*End*/
 
     /*Bagian Update*/
     private void updateData() {
-        final String namaLengkap = namaPengguna.getText().toString();
 
-        if (profileUri != null) {
+        final String namaLengkap = namaPengguna.getText().toString();
+        if (isChange) {
 
             final StorageReference ref = storage.child("profile_image").child(id_user + ".jpg");
             UploadTask uploadTask = ref.putFile(profileUri);
@@ -249,29 +257,9 @@ public class SettingAccount extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    private void pilihMenu() {
-
-        firestore.collection("User").document(id_user).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot != null && documentSnapshot.exists()) {
-
-                    String level = documentSnapshot.getString("Level");
-
-                    if (level.equals("mahasiswa")) {
-                        Intent mainActivity = new Intent(SettingAccount.this, MainActivity.class);
-                        startActivity(mainActivity);
-                        finish();
-                    } else {
-                        Intent mainActivity = new Intent(SettingAccount.this, AdminActivity.class);
-                        startActivity(mainActivity);
-                        finish();
-                    }
-
-                }
-            }
-        });
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     @Override
@@ -293,4 +281,58 @@ public class SettingAccount extends AppCompatActivity implements View.OnClickLis
         }
 
     }
+//
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//
+//        FirebaseUser current_user = mAuth.getCurrentUser();
+//        if (current_user != null) {
+//
+//            String id_user = mAuth.getCurrentUser().getUid();
+//            final String emailPengguna = mAuth.getCurrentUser().getEmail();
+//
+//            firestore.collection("User").document(id_user).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//                @Override
+//                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+//                    if (documentSnapshot != null && documentSnapshot.exists()) {
+//
+//                        String gambar = documentSnapshot.getString("gambar_profile");
+//                        String level = documentSnapshot.getString("Level");
+//                        String nama = documentSnapshot.getString("nama_lengkap");
+//
+//                        if (gambar != null) {
+//                            if (level.equals("admin")) {
+//                                Intent adminActivity = new Intent(SettingAccount.this, AdminActivity.class);
+//                                startActivity(adminActivity);
+//                                finish();
+//                            } else if (level.equals("mahasiswa")) {
+//                                Intent mainActivity = new Intent(SettingAccount.this, MainActivity.class);
+//                                startActivity(mainActivity);
+//                                finish();
+//                            } else {
+//
+//                                Intent penggunaActivity = new Intent(SettingAccount.this, Validasi.class);
+//                                penggunaActivity.putExtra("namaLengkap", nama);
+//                                penggunaActivity.putExtra("email", emailPengguna);
+//                                startActivity(penggunaActivity);
+//                                finish();
+//
+//                            }
+//                        } else {
+//                            Intent setting = new Intent(SettingAccount.this, SettingAccount.class);
+//                            startActivity(setting);
+//                            finish();
+//                        }
+//
+//                    }
+//                }
+//            });
+//
+//        } else {
+//            Intent welcomeLogin = new Intent(SettingAccount.this, WelcomeLogin.class);
+//            startActivity(welcomeLogin);
+//            finish();
+//        }
+//    }
 }

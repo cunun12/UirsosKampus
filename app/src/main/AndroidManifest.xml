@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.uirsos.www.uirsoskampus"
-    android:installLocation="preferExternal">
+    package="com.uirsos.www.uirsoskampus">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
-
-    <uses-feature android:name="android.hardware.Camera" />
 
     <application
         android:allowBackup="true"
@@ -21,13 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Profile.AdminProfile"/>
-        <activity android:name=".StatusInfo.AdminActivity" />
-        <activity android:name=".Profile.SettingAccount" />
-        <activity android:name=".SignUp.RegistEmail" />
-        <activity
-            android:name=".SignUp.Validasi"
-            tools:ignore="InnerclassSeparator" />
+
         <activity android:name=".ScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,6 +26,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".SignUp.Validasi"
+            tools:ignore="InnerclassSeparator" />
+        <activity
+            android:name=".Profile.AdminProfile"
+            tools:ignore="InnerclassSeparator" />
+        <activity
+            android:name=".StatusInfo.AdminActivity"
+            tools:ignore="InnerclassSeparator" />
+        <activity
+            android:name=".Profile.SettingAccount"
+            tools:ignore="InnerclassSeparator" />
+        <activity
+            android:name=".SignUp.RegistEmail"
+            tools:ignore="InnerclassSeparator" />
         <activity
             android:name=".SignUp.RegistPertama"
             tools:ignore="InnerclassSeparator" />
@@ -94,16 +101,6 @@
             android:label="@string/title_activity_password"
             android:theme="@style/AppTheme"
             tools:ignore="InnerclassSeparator" />
-
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
-        </provider>
     </application>
 
 </manifest>

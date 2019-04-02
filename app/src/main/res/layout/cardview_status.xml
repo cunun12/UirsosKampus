@@ -66,7 +66,7 @@
                     android:id="@+id/post_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerInside"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/no_picture" />
 
                 <ImageView
@@ -110,13 +110,15 @@
                         android:id="@+id/post_Like"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
-                        android:src="@mipmap/action_like_grey"/>
+                        android:src="@mipmap/action_like_grey"
+                        android:contentDescription="@string/todo" />
 
                     <TextView
                         android:id="@+id/post_likeCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginStart="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -131,13 +133,15 @@
                         android:layout_width="25dp"
                         android:layout_height="25dp"
                         android:src="@drawable/ic_comment"
-                        android:tint="@color/likeBtnGray"/>
+                        android:tint="@color/likeBtnGray"
+                        android:contentDescription="@string/todo" />
 
                     <TextView
+                        android:id="@+id/count_komentar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
-                        android:text="Komentar" />
+                        android:layout_marginStart="10dp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

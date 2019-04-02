@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.uirsos.www.uirsoskampus.ScreenActivity;
 import com.uirsos.www.uirsoskampus.StatusInfo.AdminActivity;
 import com.uirsos.www.uirsoskampus.R;
 import com.uirsos.www.uirsoskampus.StatusInfo.MainActivity;
@@ -47,9 +48,11 @@ public class WelcomeLogin extends AppCompatActivity {
         super.onStart();
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        id_user = mAuth.getCurrentUser().getUid();
+
+        Log.d(TAG, "onStart: user" + id_user);
 
         if (currentUser != null) {
+            id_user = mAuth.getCurrentUser().getUid();
 
             firestore.collection("User").document(id_user).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
@@ -62,7 +65,7 @@ public class WelcomeLogin extends AppCompatActivity {
                             Intent mainActivity = new Intent(WelcomeLogin.this, MainActivity.class);
                             startActivity(mainActivity);
                             finish();
-                        } else {
+                        } else if (level.equals("admin")) {
                             Intent mainActivity = new Intent(WelcomeLogin.this, AdminActivity.class);
                             startActivity(mainActivity);
                             finish();
@@ -73,9 +76,7 @@ public class WelcomeLogin extends AppCompatActivity {
             });
 
         } else {
-
-            Log.d("Login", "onStart: LoginActivity.class");
-
+            Log.d(TAG, "onStart: LoginActivtity");
         }
     }
 }

@@ -13,12 +13,16 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.uirsos.www.uirsoskampus.Profile.SettingAccount;
 import com.uirsos.www.uirsoskampus.R;
+import com.uirsos.www.uirsoskampus.StatusInfo.AdminActivity;
 import com.uirsos.www.uirsoskampus.StatusInfo.MainActivity;
 
 public class LoginEmail extends AppCompatActivity implements View.OnClickListener {
@@ -27,6 +31,7 @@ public class LoginEmail extends AppCompatActivity implements View.OnClickListene
 
     /*Firebase*/
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,12 +76,51 @@ public class LoginEmail extends AppCompatActivity implements View.OnClickListene
 
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
+            public void onComplete(@NonNull final Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    Intent intent = new Intent(LoginEmail.this, SettingAccount.class);
-                    startActivity(intent);
-                    finish();
-                    Toast.makeText(LoginEmail.this, "Login Berhasil", Toast.LENGTH_SHORT).show();
+
+                    FirebaseUser user_id = mAuth.getCurrentUser();
+                    if (user_id != null) {
+                        String userID = mAuth.getCurrentUser().getUid();
+                        firestore.collection("User").document(userID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot != null && documentSnapshot.exists()) {
+
+                                    String gambar = documentSnapshot.getString("gambar_profile");
+                                    String level = documentSnapshot.getString("Level");
+
+                                    assert level != null;
+                                    if (level.equals("admin")) {
+                                        if (gambar != null) {
+                                            Intent adminActivity = new Intent(LoginEmail.this, AdminActivity.class);
+                                            startActivity(adminActivity);
+                                            finish();
+                                            Toast.makeText(LoginEmail.this, "Login Berhasil", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Intent intent = new Intent(LoginEmail.this, SettingAccount.class);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    } else if (level.equals("mahasiswa")) {
+                                        if (gambar != null) {
+                                            Intent mainActivity = new Intent(LoginEmail.this, MainActivity.class);
+                                            startActivity(mainActivity);
+                                            finish();
+                                            Toast.makeText(LoginEmail.this, "Login Berhasil", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Intent intent = new Intent(LoginEmail.this, SettingAccount.class);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        Toast.makeText(LoginEmail.this, "Belum berhasil Login", Toast.LENGTH_SHORT).show();
+                    }
+
                 } else {
                     logEmail.setError("Check email!");
                     logPass.setError("Check password!");
@@ -97,6 +141,32 @@ public class LoginEmail extends AppCompatActivity implements View.OnClickListene
 
         if (currentUser != null) {
 
+            String user_id = mAuth.getUid();
+            final String emailPengguna = mAuth.getCurrentUser().getEmail();
+            firestore.collection("User").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        String level = task.getResult().getString("Level");
+                        String nama = task.getResult().getString("nama_lengkap");
+
+                        assert level != null;
+                        switch (level) {
+                            case "admin":
+                                Intent adminActivity = new Intent(LoginEmail.this, AdminActivity.class);
+                                startActivity(adminActivity);
+                                finish();
+                                break;
+                            case "mahasiswa":
+                                Intent mainActivity = new Intent(LoginEmail.this, MainActivity.class);
+                                startActivity(mainActivity);
+                                finish();
+                                break;
+                        }
+                    }
+
+                }
+            });
             Intent setting = new Intent(LoginEmail.this, SettingAccount.class);
             startActivity(setting);
             finish();

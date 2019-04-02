@@ -71,21 +71,6 @@ public class AdapterBerita extends RecyclerView.Adapter<AdapterBerita.HolderBeri
             }
         });
 
-//        holder.mItemBerita.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent(v.getContext(), DetailBerita.class);
-//                i.putExtra("id_tanggal", itemBerita.get(position).getTanggal());
-//                i.putExtra("id_hari", itemBerita.get(position).getHari());
-//                i.putExtra("id_fakultas", itemBerita.get(position).getFakultas());
-//                i.putExtra("id_judul", itemBerita.get(position).getJudul());
-//                i.putExtra("id_deskripsi", itemBerita.get(position).getIsi_berita());
-//                i.putExtra("id_img", itemBerita.get(position).getImg());
-//                v.getContext().startActivity(i);
-//            }
-//        });
-
-
     }
 
     @Override

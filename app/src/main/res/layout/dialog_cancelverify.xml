@@ -41,12 +41,6 @@
             android:text="Prodi tidak sama dengan yang ada di KTM" />
     </RadioGroup>
 
-    <EditText
-        android:id="@+id/messageAdmin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Message" />
-
     <Button
         android:id="@+id/btn_proses"
         android:layout_width="match_parent"

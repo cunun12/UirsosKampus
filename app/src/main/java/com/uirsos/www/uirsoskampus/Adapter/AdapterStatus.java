@@ -42,6 +42,8 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.content.ContentValues.TAG;
@@ -141,7 +143,7 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
             e.printStackTrace();
         }
 
-        if (detik<1){
+        if (detik < 1) {
             Log.d(TAG, "onBindViewHolder: detik" + detik);
             holder.setTime("Baru");
         } else if (detik < 60) {
@@ -165,7 +167,20 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
         }
 
 
-    /*Start Fitur Like*/
+        /*membuat jumlah komentar*/
+        firebaseFirestore.collection("posting/"+postId+"/komentar").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot docSnap, @Nullable FirebaseFirestoreException e) {
+                if (docSnap != null){
+                    int count = docSnap.size();
+                    holder.countKomentar(count);
+                } else {
+                    holder.countKomentar(0);
+                }
+            }
+        });
+
+        /*Start Fitur Like*/
 
         //getCount
         firebaseFirestore.collection("posting/" + postId + "/Likes").addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -237,7 +252,7 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
             }
         });
 
-    /*End Like*/
+        /*End Like*/
 
         holder.lineUser.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -263,18 +278,18 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
         });
 
 
-    /*Tombol Komentar*/
+        /*Tombol Komentar*/
 
-    holder.btnKomentar.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            Intent komentar = new Intent(view.getContext(), KomentarActivity.class);
-            komentar.putExtra("idPost", postLists.get(position).PostId);
-            view.getContext().startActivity(komentar);
-        }
-    });
+        holder.btnKomentar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent komentar = new Intent(view.getContext(), KomentarActivity.class);
+                komentar.putExtra("idPost", postLists.get(position).PostId);
+                view.getContext().startActivity(komentar);
+            }
+        });
 
-    /*End Komentar*/
+        /*End Komentar*/
     }
 
 
@@ -287,7 +302,7 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
 
         private View mView;
 
-        private TextView descView, postDate, postUserName, postLikeCount;
+        private TextView descView, postDate, postUserName, postLikeCount, countKomentar;
         private ImageView postImage, likeImage;
         private CircleImageView postUserImage;
 
@@ -319,19 +334,26 @@ public class AdapterStatus extends RecyclerView.Adapter<AdapterStatus.StatusHold
 
         }
 
-        public void setTime(String date) {
+        private void setTime(String date) {
             postDate = mView.findViewById(R.id.date_post);
             postDate.setText(date);
         }
 
-        public void updateLikeCount(int count) {
+        @SuppressLint("SetTextI18n")
+        private void updateLikeCount(int count) {
             postLikeCount = mView.findViewById(R.id.post_likeCount);
             postLikeCount.setText(count + " Suka");
         }
 
+        @SuppressLint("SetTextI18n")
+        private void countKomentar(int count) {
+            countKomentar = mView.findViewById(R.id.count_komentar);
+            countKomentar.setText(count + " Komentar");
+        }
+
 
         @SuppressLint("CheckResult")
-        public void setUserData(String name, String image) {
+        private void setUserData(String name, String image) {
             postUserName = mView.findViewById(R.id.nama_Pengguna);
             postUserImage = mView.findViewById(R.id.image_pic);
 

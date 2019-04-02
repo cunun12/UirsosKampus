@@ -233,15 +233,15 @@ public class ProfileActivity extends AppCompatActivity {
         sendToLogin();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            sendToLogin();
-        }
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        if (currentUser == null) {
+//            sendToLogin();
+//        }
+//    }
 
     private void sendToLogin() {
 

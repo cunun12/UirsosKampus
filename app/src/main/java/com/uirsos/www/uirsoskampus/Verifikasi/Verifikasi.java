@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +29,7 @@ import com.uirsos.www.uirsoskampus.POJO.User;
 import com.uirsos.www.uirsoskampus.POJO.Verify;
 import com.uirsos.www.uirsoskampus.R;
 import com.uirsos.www.uirsoskampus.SignUp.LoginActivity;
+import com.uirsos.www.uirsoskampus.SignUp.LoginEmail;
 import com.uirsos.www.uirsoskampus.StatusInfo.AdminActivity;
 import com.uirsos.www.uirsoskampus.Utils.BottomNavigationHelper;
 
@@ -77,9 +79,7 @@ public class Verifikasi extends AppCompatActivity {
 
         viewVerifikasi();
 
-        if (mAuth.getCurrentUser() != null) {
-            setupBottomNavigation();
-        }
+        setupBottomNavigation();
     }
 
     private void viewVerifikasi() {
@@ -92,17 +92,15 @@ public class Verifikasi extends AppCompatActivity {
                         if (documentSnapshots.isEmpty()) {
                             Toast.makeText(Verifikasi.this, "Data masih kosong", Toast.LENGTH_SHORT).show();
                         } else {
-
-                            if (isFirstPageFirstLoad) {
-
-                                lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
-                                listVerify.clear();
-                                listUser.clear();
-
+                            if (e != null) {
+                                Log.w(TAG, "listen:error", e);
+                                return;
                             }
-                            for (DocumentChange doc : documentSnapshots.getDocumentChanges()) {
 
+                            for (DocumentChange doc : documentSnapshots.getDocumentChanges()) {
                                 if (doc.getType() == DocumentChange.Type.ADDED) {
+                                    Log.d(TAG, "New city: " + doc.getDocument().getData());
+
                                     String verifyId = doc.getDocument().getId();
 
                                     final Verify verify = doc.getDocument().toObject(Verify.class).withId(verifyId);
@@ -113,23 +111,23 @@ public class Verifikasi extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                             if (task.isSuccessful()) {
-                                                User user = task.getResult().toObject(User.class);
 
-                                                if (isFirstPageFirstLoad) {
+                                                String level = task.getResult().getString("Level");
+                                                Log.d(TAG, "onComplete: " + level);
+
+                                                if (level.equals("admin")) {
+                                                    Log.d(TAG, "onComplete: " + level);
+                                                } else {
+                                                    User user = task.getResult().toObject(User.class);
                                                     listUser.add(user);
                                                     listVerify.add(verify);
-                                                } else {
-                                                    listUser.add(0, user);
-                                                    listVerify.add(0, verify);
+
+                                                    verifyAdapter.notifyDataSetChanged();
                                                 }
                                             }
-
-                                            verifyAdapter.notifyDataSetChanged();
                                         }
                                     });
-
                                 }
-
                             }
 
                         }
@@ -156,9 +154,14 @@ public class Verifikasi extends AppCompatActivity {
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
-            Intent intentLogin = new Intent(Verifikasi.this, LoginActivity.class);
+            Intent intentLogin = new Intent(Verifikasi.this, LoginEmail.class);
             startActivity(intentLogin);
             finish();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
     }
 }

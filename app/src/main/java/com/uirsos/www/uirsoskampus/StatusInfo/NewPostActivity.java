@@ -239,26 +239,6 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
                             }
                         });
 
-//                        firestore.collection("posting").add(postingMap)
-//                                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-//                                    @Override
-//                                    public void onComplete(@NonNull Task<DocumentReference> task) {
-//
-//                                        if (task.isSuccessful()) {
-//                                            progressBar.setVisibility(View.GONE);
-//                                            Intent beritaIntent = new Intent(NewPostActivity.this, MainActivity.class);
-//                                            startActivity(beritaIntent);
-//                                            finish();
-//
-//                                        } else {
-//
-//                                            String Error = task.getException().getMessage();
-//                                            Toast.makeText(NewPostActivity.this, "Uploaod Gagal" + Error, Toast.LENGTH_SHORT).show();
-//
-//                                        }
-//
-//                                    }
-//                                });
                     } else {
                         Toast.makeText(NewPostActivity.this, "terjadi Kesalahan", Toast.LENGTH_SHORT).show();
                     }
@@ -271,91 +251,6 @@ public class NewPostActivity extends AppCompatActivity implements View.OnClickLi
             Toast.makeText(this, "Maaf silakan masukan gambar sebelum memposting", Toast.LENGTH_SHORT).show();
 
         }
-//
-//
-//            final String randomImage = UUID.randomUUID().toString();
-//
-//            StorageReference filePath = storageReference.child("post_image").child(randomImage + ".jpg");
-//            filePath.putFile(postImageURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-//                @Override
-//                public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
-//
-////                    final String downloadUri = task.getResult().getDownloadUrl().toString();
-//
-//                    if (task.isSuccessful()) {
-//
-//                        File newImageFile = new File(postImageURI.getPath());
-//
-//                        try {
-//                            compresImageFile = new Compressor(NewPostActivity.this)
-//                                    .setQuality(2)
-//                                    .compressToBitmap(newImageFile);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                        compresImageFile.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-//                        byte[] thumbData = baos.toByteArray();
-//
-//                        UploadTask uploadTask = null;
-//                        uploadTask = storageReference.child("post_image/thumbs").child(randomImage + ".jpg")
-//                                .putBytes(thumbData);
-//
-//                        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                            @Override
-//                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//
-////                                String downloadThumbUri = taskSnapshot.getDownloadUrl().toString();
-//
-//                                Map<String, Object> postMap = new HashMap<>();
-////                                postMap.put("imagePost", downloadUri);
-////                                postMap.put("image_thumb", downloadThumbUri);
-//                                postMap.put("deskripsi", textKet);
-//                                postMap.put("user_id", user_id);
-//                                postMap.put("fakultas", fakultas);
-//                                postMap.put("postTime", getTimestamp());
-//
-//                                firestore.collection("posting").add(postMap)
-//                                        .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-//                                            @Override
-//                                            public void onComplete(@NonNull Task<DocumentReference> task) {
-//
-//                                                if (task.isSuccessful()) {
-//                                                    progressBar.setVisibility(View.GONE);
-//                                                    Intent beritaIntent = new Intent(NewPostActivity.this, MainActivity.class);
-//                                                    startActivity(beritaIntent);
-//                                                    finish();
-//
-//                                                } else {
-//
-//                                                    String Error = task.getException().getMessage();
-//                                                    Toast.makeText(NewPostActivity.this, "Uploaod Gagal" + Error, Toast.LENGTH_SHORT).show();
-//
-//                                                }
-//
-//                                            }
-//                                        });
-//                            }
-//                        }).addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//                                String Error = task.getException().getMessage();
-//                                Toast.makeText(NewPostActivity.this, "Gagal Upload " + Error, Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
-//
-//
-//                    } else {
-//
-//                        String Error = task.getException().getMessage();
-//                        Toast.makeText(NewPostActivity.this, "Error tu =" + Error, Toast.LENGTH_SHORT).show();
-//
-//                    }
-//
-//                }
-//            });
-
 
     }
 

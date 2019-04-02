@@ -1,36 +1,76 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context="com.uirsos.www.uirsoskampus.StatusInfo.InfoFragment">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:context="com.uirsos.www.uirsoskampus.StatusInfo.InfoFragment">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/refresh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvBerita"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textKiri"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/yellow"
+                    android:padding="10dp"
+                    android:text="Berita Dekan"
+                    android:textColor="@color/green" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rvDekan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:clipToPadding="false" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/green"
+                    android:padding="10dp"
+                    android:text="Berita Kampus"
+                    android:textColor="@color/yellow" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rvBerita"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"/>
+            </LinearLayout>
+
+        </ScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <RelativeLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:visibility="gone"
         tools:ignore="UselessLeaf">
 
         <TextView
             android:id="@+id/koneksi"
-            android:layout_centerInParent="true"
-            android:textColor="#ff0000"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/no_Connection"
+            android:layout_centerInParent="true"
             android:gravity="center_horizontal"
-            android:textAllCaps="true"/>
+            android:text="@string/no_Connection"
+            android:textAllCaps="true"
+            android:textColor="#ff0000" />
 
     </RelativeLayout>
 
-</FrameLayout>
+</RelativeLayout>

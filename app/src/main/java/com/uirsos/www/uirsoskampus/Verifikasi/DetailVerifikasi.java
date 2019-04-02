@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -72,7 +73,7 @@ public class DetailVerifikasi extends AppCompatActivity implements View.OnClickL
         textNPM = findViewById(R.id.text_NPM);
         textNama = findViewById(R.id.text_NamaPengguna);
         textFakultas = findViewById(R.id.text_fakultas);
-        textProdi= findViewById(R.id.text_prodi);
+        textProdi = findViewById(R.id.text_prodi);
         buttonBack = findViewById(R.id.backArrow);
 
         /*firebase*/
@@ -122,13 +123,12 @@ public class DetailVerifikasi extends AppCompatActivity implements View.OnClickL
                 finish();
                 break;
 
-                /*Perintah ini untuk memberikan informasi verify gagal*/
+            /*Perintah ini untuk memberikan informasi verify gagal*/
             case R.id.cancel_Verify:
 
                 final AlertDialog.Builder a = new AlertDialog.Builder(DetailVerifikasi.this);
                 a.setTitle("Cancel Verifikasi");
                 final View mView = getLayoutInflater().inflate(R.layout.dialog_cancelverify, null);
-                final EditText etMessage = mView.findViewById(R.id.messageAdmin);
                 final RadioGroup rgVerify = mView.findViewById(R.id.rgCancelVerify);
 
                 user_id = fAuth.getUid();
@@ -141,22 +141,30 @@ public class DetailVerifikasi extends AppCompatActivity implements View.OnClickL
                         int selectedId = rgVerify.getCheckedRadioButtonId();
                         RadioButton rbMessage = mView.findViewById(selectedId);
                         final String message = rbMessage.getText().toString();
+                        String npm = textNPM.getText().toString();
+                        String invalid = "invalid";
 
                         Map<String, String> data = new HashMap<>();
                         data.put("message", message);
+                        data.put("npm", npm);
+                        data.put("validasi", invalid);
 
                         Log.d("VErifikasi", "onClick: " + getVerifyId);
-                        firebaseFirestore.collection("verifikasi").document(getVerifyId).set(data)
+                        firebaseFirestore.collection("Validasi").document(getVerifyId).set(data)
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
 
-                                        StorageReference storage = reference.child("verify/" + getVerifyId + ".jpg");
+                                        StorageReference storage = reference.child("gambar_ktm/" + getVerifyId + ".jpg");
                                         Log.d(TAG, "onComplete: itu storage " + storage);
                                         storage.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
-                                                Toast.makeText(DetailVerifikasi.this, "Data Berhasil dihapus", Toast.LENGTH_SHORT).show();
+
+                                                Intent i = new Intent(DetailVerifikasi.this, Verifikasi.class);
+                                                startActivity(i);
+                                                finish();
+
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
                                             @Override
@@ -170,7 +178,6 @@ public class DetailVerifikasi extends AppCompatActivity implements View.OnClickL
 
                                     }
                                 });
-                        Toast.makeText(DetailVerifikasi.this, "message = " + message, Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
                 });
@@ -181,7 +188,7 @@ public class DetailVerifikasi extends AppCompatActivity implements View.OnClickL
 
                 break;
 
-                /*perintah ini untuk user yang verify berhasil*/
+            /*perintah ini untuk user yang verify berhasil*/
             case R.id.terima_Verify:
 
                 final AlertDialog.Builder t = new AlertDialog.Builder(DetailVerifikasi.this);
@@ -191,11 +198,8 @@ public class DetailVerifikasi extends AppCompatActivity implements View.OnClickL
                             public void onClick(DialogInterface dialogInterface, int i) {
 
                                 Log.d(TAG, "onClick: VerifyId " + getVerifyId);
-                                final String txtVerify = "valid";
-                                final String txtLevel = "Mahasiswa";
-                                Toast.makeText(DetailVerifikasi.this, "Verifikasi " + txtVerify + " Level " + txtLevel, Toast.LENGTH_SHORT).show();
 
-                                firebaseFirestore.collection("verifikasi").document(getVerifyId)
+                                firebaseFirestore.collection("Validasi").document(getVerifyId)
                                         .delete()
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
@@ -203,28 +207,11 @@ public class DetailVerifikasi extends AppCompatActivity implements View.OnClickL
 
                                                 listVerify.clear();
 
-                                                DocumentReference updateUser = firebaseFirestore.collection("users").document(getVerifyId);
-                                                updateUser.update("level", txtLevel);
-                                                updateUser.update("verifikasi", txtVerify)
-                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-
-                                                                Intent verifikasi = new Intent(DetailVerifikasi.this, Verifikasi.class);
-                                                                Toast.makeText(DetailVerifikasi.this, "Verifikasi Berhasil", Toast.LENGTH_SHORT).show();
-                                                                verifikasi.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                                                startActivity(verifikasi);
-                                                                finish();
-
-                                                            }
-                                                        }).addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        String error = e.getMessage();
-
-                                                        Log.d(TAG, "onFailure: " + error);
-                                                    }
-                                                });
+                                                Intent verifikasi = new Intent(DetailVerifikasi.this, Verifikasi.class);
+                                                Toast.makeText(DetailVerifikasi.this, "Verifikasi Berhasil", Toast.LENGTH_SHORT).show();
+                                                verifikasi.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                startActivity(verifikasi);
+                                                finish();
 
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {

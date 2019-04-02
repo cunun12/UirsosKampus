@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,6 +29,7 @@ import com.uirsos.www.uirsoskampus.R;
 import com.uirsos.www.uirsoskampus.SignUp.LoginActivity;
 import com.uirsos.www.uirsoskampus.SignUp.LoginEmail;
 import com.uirsos.www.uirsoskampus.SignUp.RegisterActivity;
+import com.uirsos.www.uirsoskampus.SignUp.Validasi;
 import com.uirsos.www.uirsoskampus.Utils.BottomNavigationHelper;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.uirsos.www.uirsoskampus.Utils.SectionPagerAdapter;
@@ -71,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         SectionPagerAdapter view = new SectionPagerAdapter(getSupportFragmentManager());
         view.addFragment(new StatusFragment());// fragment 2
         view.addFragment(new InfoFragment());//fragment 1
-        view.addFragment(new Chat()); // fragment 0
+//        view.addFragment(new Chat()); // fragment 0
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.bodyContainer);
         viewPager.setAdapter(view);
@@ -80,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         tab.setupWithViewPager(viewPager);
 
         tab.getTabAt(1).setText(getString(R.string.info));
-        tab.getTabAt(2).setText(R.string.Chat);
+//        tab.getTabAt(2).setText(R.string.Chat);
         tab.getTabAt(0).setText(getString(R.string.status));
 
     }
@@ -96,6 +99,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
@@ -106,17 +115,39 @@ public class MainActivity extends AppCompatActivity {
 
             current_user_id = mAuth.getCurrentUser().getUid();
 
-            firebaseFirestore.collection("User").document(current_user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            firebaseFirestore.collection("Validasi").document(current_user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     if (task.isSuccessful()) {
-                        String gambar = task.getResult().getString("gambar_profile");
-                        if (gambar == null) {
-                            Intent setting = new Intent(MainActivity.this, SettingAccount.class);
-                            startActivity(setting);
-                            finish();
+                        String validasi = task.getResult().getString("validasi");
+                        if (validasi != null && validasi.equals("invalid")) {
+
+                            firebaseFirestore.collection("User").document(current_user_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    if (documentSnapshot != null && documentSnapshot.exists()){
+                                        String email = documentSnapshot.getString("email");
+                                        String namaLengkap = documentSnapshot.getString("nama_lengkap");
+
+                                        Intent mainValid = new Intent(MainActivity.this, Validasi.class);
+                                        mainValid.putExtra("valid", 1);
+                                        mainValid.putExtra("namaLengkap", namaLengkap);
+                                        mainValid.putExtra("email", email);
+                                        startActivity(mainValid);
+                                        finish();
+                                    }
+                                }
+                            });
+
                         }
+                    } else {
+
                     }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(MainActivity.this, "tidak ditemukan Koneksi internet", Toast.LENGTH_SHORT).show();
                 }
             });
 

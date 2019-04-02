@@ -44,6 +44,19 @@
                     android:text="Validasi Akun"
                     android:textSize="20sp" />
 
+                <TextView
+                    android:id="@+id/validasi_warning"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/infovalidasi"
+                    android:textColor="@color/yellow"
+                    android:textSize="14sp"
+                    android:drawableLeft="@mipmap/ic_warning"
+                    android:background="#FF0000"/>
+
             </LinearLayout>
 
             <LinearLayout
